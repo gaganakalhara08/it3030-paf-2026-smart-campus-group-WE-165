@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -30,9 +31,15 @@ public class SecurityConfig {
                 // Public endpoints (no authentication needed)
                 .requestMatchers("/api/auth/**", "/api/users/register", "/api/users/check").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+                
+                // User endpoints (authenticated users)
+                .requestMatchers("/api/users/me", "/api/users/me/**").authenticated()
+                
                 // Role-based endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/technician/**").hasAnyRole("TECHNICIAN", "ADMIN")
+                
                 // All other endpoints need authentication
                 .anyRequest().authenticated()
             )
