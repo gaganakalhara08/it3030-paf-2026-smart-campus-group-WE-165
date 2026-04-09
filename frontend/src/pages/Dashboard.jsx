@@ -1,15 +1,36 @@
 import React from "react";
+import "../App.css";
 
 const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Dashboard</h1>
+    <div className="dashboard-container">
+      
+      {/* Sidebar */}
+      <div className="sidebar">
+        <h2 className="logo-text">CampusOps</h2>
 
-      <p><strong>Name:</strong> {user?.name}</p>
-      <p><strong>Email:</strong> {user?.email}</p>
-      <p><strong>Roles:</strong> {user?.roles?.join(", ")}</p>
+        <ul>
+          <li>Dashboard</li>
+          <li>Bookings</li>
+          <li>Notifications</li>
+          <li>Profile</li>
+        </ul>
+      </div>
+
+      {/* Main Content */}
+      <div className="main-content">
+        <h1>Welcome, {user?.name}</h1>
+        <p>Email: {user?.email}</p>
+
+        <div className="cards">
+          <div className="card">My Bookings</div>
+          <div className="card">Notifications</div>
+          <div className="card">Quick Actions</div>
+        </div>
+      </div>
+
     </div>
   );
 };
