@@ -1,17 +1,68 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import UserDashboard from "./UserDashboard";
+import AdminDashboard from "./AdminDashboard";
+import TechnicianDashboard from "./TechnicianDashboard";
 
 const Dashboard = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [role, setRole] = useState(null);
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h1>Dashboard</h1>
+  useEffect(() => {
+    // 🔥 STEP 1: Extract token from URL
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get("token");
 
-      <p><strong>Name:</strong> {user?.name}</p>
-      <p><strong>Email:</strong> {user?.email}</p>
-      <p><strong>Roles:</strong> {user?.roles?.join(", ")}</p>
-    </div>
-  );
+    if (tokenFromUrl) {
+      localStorage.setItem("token", tokenFromUrl);
+
+      // Clean URL
+      window.history.replaceState({}, document.title, "/dashboard");
+    }
+
+    // 🔥 STEP 2: Fetch user
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          console.log("No token found");
+          return;
+        }
+
+        const res = await fetch("http://localhost:8080/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        console.log("User Data:", data);
+
+        const roles = data.roles || [];
+
+        if (roles.includes("ROLE_ADMIN")) {
+          setRole("ADMIN");
+        } else if (roles.includes("ROLE_TECHNICIAN")) {
+          setRole("TECHNICIAN");
+        } else {
+          setRole("USER");
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  // ⏳ Loading
+  if (!role) {
+    return <div>Loading...</div>;
+  }
+
+  // 🎯 Role-based render
+  if (role === "ADMIN") return <AdminDashboard />;
+  if (role === "TECHNICIAN") return <TechnicianDashboard />;
+  return <UserDashboard />;
 };
 
 export default Dashboard;
