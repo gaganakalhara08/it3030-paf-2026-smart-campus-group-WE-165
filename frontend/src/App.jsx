@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import UserDashboard from "./pages/UserDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
@@ -17,6 +18,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/user-dashboard"
+          element={
+            
+              <UserDashboard />
+            
+          }
+        />
+
       </Routes>
     </Router>
   );

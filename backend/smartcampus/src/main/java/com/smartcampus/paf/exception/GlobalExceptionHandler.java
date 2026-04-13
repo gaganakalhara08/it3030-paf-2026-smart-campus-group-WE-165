@@ -112,4 +112,48 @@ public class GlobalExceptionHandler {
         
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    // ==================== TICKET-SPECIFIC HANDLERS ====================
+
+    // 404 - Ticket Not Found
+    @ExceptionHandler(TicketNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleTicketNotFound(
+            TicketNotFoundException ex, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        response.put("error", "Ticket Not Found");
+        response.put("message", ex.getMessage());
+        response.put("path", request.getRequestURI());
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    // 404 - Ticket Comment Not Found
+    @ExceptionHandler(TicketCommentNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleTicketCommentNotFound(
+            TicketCommentNotFoundException ex, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        response.put("error", "Comment Not Found");
+        response.put("message", ex.getMessage());
+        response.put("path", request.getRequestURI());
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    // 400 - Invalid Ticket Operation
+    @ExceptionHandler(InvalidTicketOperationException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidTicketOperation(
+            InvalidTicketOperationException ex, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Invalid Operation");
+        response.put("message", ex.getMessage());
+        response.put("path", request.getRequestURI());
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 }
