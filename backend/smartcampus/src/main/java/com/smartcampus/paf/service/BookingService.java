@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 public interface BookingService {
     
@@ -25,6 +26,7 @@ public interface BookingService {
     BookingResponseDTO approveBooking(String bookingId, String adminEmail);
     BookingResponseDTO rejectBooking(String bookingId, String reason, String adminEmail);
     BookingResponseDTO cancelBooking(String bookingId, String userEmail);
+    BookingResponseDTO checkInBooking(String bookingId, String userEmail);
     BookingResponseDTO updateBooking(String bookingId, BookingRequestDTO request, String userEmail);
     
     // DELETE
@@ -33,4 +35,7 @@ public interface BookingService {
     // UTILITY
     boolean checkConflict(String resourceId, LocalDate date, LocalTime startTime, LocalTime endTime);
     List<LocalTime[]> getAvailableTimeSlots(String resourceId, LocalDate date);
+    
+    // ANALYTICS
+    Map<String, Object> getAnalytics();
 }

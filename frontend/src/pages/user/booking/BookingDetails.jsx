@@ -174,7 +174,7 @@ const BookingDetails = () => {
 
       toast.success("Booking deleted successfully!", { id: toastId });
       setTimeout(() => {
-        navigate("/user/bookings");
+        navigate("/user/bookings/dashboard");
       }, 1000);
     } catch (error) {
       console.error("Error deleting booking:", error);
@@ -256,7 +256,7 @@ const BookingDetails = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
         <div className="max-w-2xl mx-auto">
           <button
-            onClick={() => navigate("/user/bookings")}
+            onClick={() => navigate("/user/bookings/dashboard")}
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-6"
           >
             <ArrowLeft size={20} />
@@ -277,7 +277,7 @@ const BookingDetails = () => {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <button
-            onClick={() => navigate("/user/bookings")}
+            onClick={() => navigate("/user/bookings/dashboard")}
             className="p-2 hover:bg-white rounded-lg transition-all"
           >
             <ArrowLeft size={24} className="text-gray-700" />
@@ -444,7 +444,7 @@ const BookingDetails = () => {
             )}
 
             <button
-              onClick={() => navigate("/user/bookings")}
+              onClick={() => navigate("/user/bookings/dashboard")}
               className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
             >
               Back to List

@@ -8,7 +8,9 @@ import ProtectedRoute from "./ProtectedRoute";
 import CreateBooking from "../pages/user/booking/CreateBooking";
 import BookingDetails from "../pages/user/booking/BookingDetails";
 import BookingDashboard from "../pages/user/booking/BookingDashboard";
+import BookingCheckIn from "../pages/user/booking/BookingCheckIn";
 import AdminBookingDashboard from "../pages/admin/booking/AdminBookingDashboard";
+import AdminAnalyticsDashboard from "../pages/admin/booking/AdminAnalyticsDashboard";
 
 const AppRoutes = () => {
   return (
@@ -45,6 +47,15 @@ const AppRoutes = () => {
             </ProtectedRoute>
           } 
         />
+
+        <Route 
+          path="/admin/analytics" 
+          element={
+            <ProtectedRoute>
+              <AdminAnalyticsDashboard />
+            </ProtectedRoute>
+          } 
+        />
         
         {/* User Routes */}
         <Route 
@@ -56,7 +67,7 @@ const AppRoutes = () => {
           } 
         />
         
-        {/* User Booking Management Routes - Dashboard MUST be before :id */}
+        {/* User Booking Management Routes */}
         <Route 
           path="/user/bookings/dashboard" 
           element={
@@ -71,6 +82,15 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <CreateBooking />
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/user/bookings/:id/check-in" 
+          element={
+            <ProtectedRoute>
+              <BookingCheckIn />
             </ProtectedRoute>
           } 
         />

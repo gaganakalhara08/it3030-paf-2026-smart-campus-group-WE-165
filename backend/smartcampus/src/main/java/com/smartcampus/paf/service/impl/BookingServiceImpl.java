@@ -19,8 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +35,6 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        // Validate time range
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new InvalidBookingRequestException("Start time must be before end time");
         }
@@ -45,7 +43,6 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidBookingRequestException("Start time cannot be equal to end time");
         }
         
-        // Check for conflicts
         if (checkConflict(request.getResourceId(), request.getBookingDate(), 
                           request.getStartTime(), request.getEndTime())) {
             throw new TimeSlotConflictException(request.getResourceId(), request.getBookingDate(), 
@@ -182,15 +179,107 @@ public class BookingServiceImpl implements BookingService {
         Booking saved = bookingRepository.save(booking);
         return mapToResponse(saved);
     }
+
+    @Override
+    @Transactional
+    public BookingResponseDTO checkInBooking(String bookingId, String userEmail) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException(bookingId));
+        
+        boolean isOwner = booking.getUser().getEmail().equals(userEmail);
+        
+        if (!isOwner) {
+            throw new UnauthorizedException("You don't have permission to check in this booking");
+        }
+        
+        if (booking.getStatus() != BookingStatus.APPROVED) {
+            throw new InvalidBookingRequestException("Only approved bookings can be checked in");
+        }
+        
+        booking.setCheckedIn(true);
+        booking.setCheckedInAt(LocalDateTime.now());
+        
+        Booking saved = bookingRepository.save(booking);
+        return mapToResponse(saved);
+    }
+
+    @Override
+    public Map<String, Object> getAnalytics() {
+        List<Booking> allBookings = bookingRepository.findAll();
+        
+        Map<String, Object> analytics = new HashMap<>();
+        
+        analytics.put("totalBookings", allBookings.size());
+        
+        long approvedCount = allBookings.stream()
+                .filter(b -> b.getStatus() == BookingStatus.APPROVED)
+                .count();
+        analytics.put("approvedBookings", approvedCount);
+        
+        long pendingCount = allBookings.stream()
+                .filter(b -> b.getStatus() == BookingStatus.PENDING)
+                .count();
+        analytics.put("pendingBookings", pendingCount);
+        
+        double avgAttendees = allBookings.stream()
+                .mapToInt(Booking::getExpectedAttendees)
+                .average()
+                .orElse(0);
+        analytics.put("averageAttendees", Math.round(avgAttendees));
+        
+        List<Map<String, Object>> topResources = allBookings.stream()
+                .collect(Collectors.groupingBy(
+                        Booking::getResourceName,
+                        Collectors.counting()
+                ))
+                .entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(5)
+                .map(entry -> {
+                    Map<String, Object> resource = new HashMap<>();
+                    resource.put("name", entry.getKey());
+                    resource.put("bookings", entry.getValue());
+                    return resource;
+                })
+                .collect(Collectors.toList());
+        analytics.put("topResources", topResources);
+        
+        Map<String, Long> statusDistribution = allBookings.stream()
+                .collect(Collectors.groupingBy(
+                        b -> b.getStatus().toString(),
+                        Collectors.counting()
+                ));
+        analytics.put("statusDistribution", statusDistribution);
+        
+        List<Map<String, Object>> peakHours = new ArrayList<>();
+        for (int hour = 8; hour < 18; hour++) {
+            final int currentHour = hour;
+            long count = allBookings.stream()
+                    .filter(b -> {
+                        try {
+                            LocalTime startTime = b.getStartTime();
+                            return startTime.getHour() == currentHour;
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    })
+                    .count();
+            
+            Map<String, Object> hourData = new HashMap<>();
+            hourData.put("hour", String.format("%02d:00", hour));
+            hourData.put("bookings", count);
+            peakHours.add(hourData);
+        }
+        analytics.put("peakHours", peakHours);
+        
+        return analytics;
+    }
     
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public BookingResponseDTO updateBooking(String bookingId, BookingRequestDTO request, String userEmail) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException(bookingId));
-        
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
         
         boolean isOwner = booking.getUser().getEmail().equals(userEmail);
         
@@ -202,12 +291,10 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidBookingRequestException("Only pending bookings can be updated");
         }
         
-        // Validate time range
         if (request.getStartTime().isAfter(request.getEndTime())) {
             throw new InvalidBookingRequestException("Start time must be before end time");
         }
         
-        // Check for conflicts (excluding current booking)
         List<Booking> conflicts = bookingRepository.findConflictingBookings(
             request.getResourceId(), request.getBookingDate(), 
             request.getStartTime(), request.getEndTime());
@@ -219,7 +306,6 @@ public class BookingServiceImpl implements BookingService {
                                                   request.getStartTime(), request.getEndTime());
         }
         
-        // Update fields
         booking.setResourceId(request.getResourceId());
         booking.setResourceName(request.getResourceName());
         booking.setResourceType(request.getResourceType());
@@ -251,7 +337,6 @@ public class BookingServiceImpl implements BookingService {
             throw new UnauthorizedException("You don't have permission to delete this booking");
         }
         
-        // Only allow deletion of PENDING or REJECTED bookings
         if (booking.getStatus() == BookingStatus.APPROVED) {
             throw new InvalidBookingRequestException("Approved bookings cannot be deleted. Please cancel instead.");
         }
@@ -268,9 +353,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<LocalTime[]> getAvailableTimeSlots(String resourceId, LocalDate date) {
         List<LocalTime[]> allSlots = new ArrayList<>();
-        LocalTime start = LocalTime.of(8, 0);  // 8:00 AM
-        LocalTime end = LocalTime.of(18, 0);   // 6:00 PM
-        int slotDuration = 60; // 60 minutes slots
+        LocalTime start = LocalTime.of(8, 0);
+        LocalTime end = LocalTime.of(18, 0);
+        int slotDuration = 60;
         
         LocalTime current = start;
         while (current.isBefore(end)) {

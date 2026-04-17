@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, Clock, Trash2, Edit, Eye, Plus, AlertCircle, CheckCircle, XCircle, LogOut, LayoutDashboard, Home } from "lucide-react";
+import { Calendar, MapPin, Clock, Trash2, Edit, Eye, Plus, AlertCircle, CheckCircle, XCircle, LogOut, LayoutDashboard, Home, QrCode } from "lucide-react";
 import toast from "react-hot-toast";
 
 const BookingDashboard = () => {
@@ -18,7 +18,10 @@ const BookingDashboard = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
       
+      console.log("Token from localStorage:", token ? "✓ Found" : "✗ Not found");
+      
       if (!token) {
+        toast.error("Please login first");
         navigate("/login");
         return;
       }
@@ -30,6 +33,12 @@ const BookingDashboard = () => {
         url = `${API_BASE_URL}/bookings/my-bookings/status/${statusFilter}`;
       }
 
+      console.log("Fetching from:", url);
+      console.log("Headers:", {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token.substring(0, 20)}...`
+      });
+
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -38,20 +47,27 @@ const BookingDashboard = () => {
         },
       });
 
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
         if (response.status === 401) {
           localStorage.removeItem("token");
+          toast.error("Session expired. Please login again.");
           navigate("/login");
           return;
         }
-        throw new Error("Failed to fetch bookings");
+        const errorText = await response.text();
+        console.error("Response error:", errorText);
+        throw new Error(`Failed to fetch bookings: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
+      console.log("Bookings data received:", data);
       setBookings(Array.isArray(data) ? data : data.content || []);
+      toast.success(`Loaded ${Array.isArray(data) ? data.length : (data.content || []).length} bookings`);
     } catch (error) {
       console.error("Error fetching bookings:", error);
-      toast.error("Failed to load bookings");
+      toast.error(`Failed to load bookings: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -329,10 +345,10 @@ const BookingDashboard = () => {
                     <span className="font-semibold">Purpose:</span> {booking.purpose}
                   </p>
 
-                  <div className="flex gap-2 mt-auto">
+                  <div className="flex gap-2 mt-auto flex-wrap">
                     <button
                       onClick={() => navigate(`/user/bookings/${booking.id}`)}
-                      className="flex-1 flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 py-2 rounded transition-all text-sm font-medium"
+                      className="flex-1 min-w-16 flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 py-2 rounded transition-all text-sm font-medium"
                     >
                       <Eye size={16} />
                       View
@@ -340,28 +356,49 @@ const BookingDashboard = () => {
                     {booking.status === "PENDING" && (
                       <button
                         onClick={() => navigate(`/user/bookings/${booking.id}`)}
-                        className="flex-1 flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 text-green-600 py-2 rounded transition-all text-sm font-medium"
+                        className="flex-1 min-w-16 flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 text-green-600 py-2 rounded transition-all text-sm font-medium"
                       >
                         <Edit size={16} />
                         Edit
                       </button>
                     )}
-                    {(booking.status === "APPROVED" || booking.status === "PENDING") && (
+                    {booking.status === "APPROVED" && (
+                      <button
+                        onClick={() => navigate(`/user/bookings/${booking.id}/check-in`)}
+                        className="flex-1 min-w-16 flex items-center justify-center gap-2 bg-cyan-50 hover:bg-cyan-100 text-cyan-600 py-2 rounded transition-all text-sm font-medium"
+                      >
+                        <QrCode size={16} />
+                        Check-In
+                      </button>
+                    )}
+                    {booking.status === "APPROVED" && (
                       <button
                         onClick={() => handleCancelBooking(booking.id)}
-                        className="flex-1 flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-600 py-2 rounded transition-all text-sm font-medium"
+                        className="flex-1 min-w-16 flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-600 py-2 rounded transition-all text-sm font-medium"
                         title="Cancel booking"
                       >
                         <Trash2 size={16} />
+                        Cancel
                       </button>
                     )}
-                    {(booking.status === "PENDING" || booking.status === "REJECTED") && (
+                    {booking.status === "PENDING" && (
                       <button
                         onClick={() => handleDeleteBooking(booking.id)}
-                        className="flex-1 flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded transition-all text-sm font-medium"
+                        className="flex-1 min-w-16 flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded transition-all text-sm font-medium"
                         title="Delete booking"
                       >
                         <Trash2 size={16} />
+                        Delete
+                      </button>
+                    )}
+                    {booking.status === "REJECTED" && (
+                      <button
+                        onClick={() => handleDeleteBooking(booking.id)}
+                        className="flex-1 min-w-16 flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded transition-all text-sm font-medium"
+                        title="Delete booking"
+                      >
+                        <Trash2 size={16} />
+                        Delete
                       </button>
                     )}
                   </div>
