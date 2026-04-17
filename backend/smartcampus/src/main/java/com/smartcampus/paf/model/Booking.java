@@ -64,6 +64,13 @@ public class Booking {
     private String rejectedBy;
     private LocalDateTime rejectedAt;
     
+    // Check-in fields - Changed from boolean to Boolean to allow NULL values
+    @Column(name = "checked_in")
+    private Boolean checkedIn;
+    
+    @Column(name = "checked_in_at")
+    private LocalDateTime checkedInAt;
+    
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     

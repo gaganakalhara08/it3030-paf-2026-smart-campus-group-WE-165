@@ -6,7 +6,8 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-
+import AppRoutes from "./routes/AppRoutes";
+import { Toaster } from "react-hot-toast";
 
 // ============== COMPONENT IMPORTS ==============
 // Route Guards
@@ -33,6 +34,9 @@ function App() {
   return (
     <Router>
       <Routes>
+
+        <Toaster position="top-right" />
+      < AppRoutes />
         {/* ========== PUBLIC ROUTES ========== */}
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -122,8 +126,7 @@ function App() {
        
       </Routes>
     </Router>
-  );
-}
+  )
+};
 
 export default App;
-

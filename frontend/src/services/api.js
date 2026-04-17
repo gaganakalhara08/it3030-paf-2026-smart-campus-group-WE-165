@@ -1,42 +1,25 @@
-import axios from "axios";
+export const API_BASE_URL = "http://localhost:8080/api";
 
-const API_BASE_URL = "http://localhost:8081/api";
+export const getToken = () => {
+  return localStorage.getItem("token");
+};
 
-// Create axios instance
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
+export const setToken = (token) => {
+  localStorage.setItem("token", token);
+};
+
+export const removeToken = () => {
+  localStorage.removeItem("token");
+};
+
+export const isAuthenticated = () => {
+  return !!getToken();
+};
+
+export const getAuthHeaders = () => {
+  const token = getToken();
+  return {
     "Content-Type": "application/json",
-  },
-});
-
-// Add token to requests
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Handle responses
-apiClient.interceptors.response.use(
-  (response) => {
-    return response.data;
-  },
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem("token");
-      window.location.href = "/";
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default apiClient;
+    "Authorization": `Bearer ${token}`,
+  };
+};
