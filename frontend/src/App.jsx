@@ -6,9 +6,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import TechnicianDashboard from "./pages/TechnicianDashboard";
-import TicketStudentView from "./pages/TicketStudentView";
-import TicketAllView from "./pages/TicketAllView";
+
 
 // ============== COMPONENT IMPORTS ==============
 // Route Guards
@@ -23,6 +21,9 @@ import Card from "./components/Card";
 // Ticket Components
 import TicketDetailsModal from "./components/TicketDetailsModal";
 import TicketCommentSection from "./components/TicketCommentSection";
+import TechnicianDashboard from "./pages/TechnicianDashboard";
+import TicketStudentView from "./pages/TicketStudentView";
+import TicketAllView from "./pages/TicketAllView";
 import CreateTicketModal from "./components/CreateTicketModal";
 
 // ============== CONTEXT IMPORTS ==============
@@ -70,6 +71,15 @@ function App() {
           element={
             //<ProtectedRoute>
               <CreateTicketModal />
+            //</ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/user-dashboard/commnet"
+          element={
+            //<ProtectedRoute>
+              <TicketCommentSection />
             //</ProtectedRoute>
           }
         />
