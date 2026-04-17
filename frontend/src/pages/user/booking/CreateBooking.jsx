@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Calendar, Users, MapPin, Send } from "lucide-react";
+import { ArrowLeft, Calendar, Users, MapPin, Send, Clock } from "lucide-react";
 import toast from "react-hot-toast";
 import { API_BASE_URL } from "../../../services/api";
 
@@ -21,7 +21,9 @@ const CreateBooking = () => {
 
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [availabilityMessage, setAvailabilityMessage] = useState("");
+  const [isAvailable, setIsAvailable] = useState(null);
 
   useEffect(() => {
     setResources([
@@ -44,26 +46,80 @@ const CreateBooking = () => {
         resourceLocation: selected.location,
         capacity: selected.capacity,
       });
+      setAvailabilityMessage("");
+      setIsAvailable(null);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
+    // Reset availability check when time changes
+    if (name === "startTime" || name === "endTime") {
+      setAvailabilityMessage("");
+      setIsAvailable(null);
+    }
   };
 
-  const timeSlots = [
-    ["09:00:00", "10:00:00"],
-    ["10:30:00", "11:30:00"],
-    ["12:00:00", "13:00:00"],
-    ["14:00:00", "15:00:00"],
-    ["15:30:00", "16:30:00"],
-    ["17:00:00", "18:00:00"],
-  ];
+  const checkAvailability = async () => {
+    if (!formData.resourceId || !formData.bookingDate || !formData.startTime || !formData.endTime) {
+      toast.error("Please select resource, date, start time and end time");
+      return;
+    }
 
-  const handleTimeSlotSelect = (slot) => {
-    setFormData({ ...formData, startTime: slot[0], endTime: slot[1] });
-    setSelectedSlot(slot);
+    // Validate time
+    if (formData.startTime >= formData.endTime) {
+      toast.error("End time must be after start time");
+      return;
+    }
+
+    setCheckingAvailability(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      // Call the correct endpoint with proper parameters
+      const params = new URLSearchParams({
+        resourceId: formData.resourceId,
+        date: formData.bookingDate,
+        startTime: `${formData.startTime}:00`,
+        endTime: `${formData.endTime}:00`
+      });
+
+      const response = await fetch(
+        `${API_BASE_URL}/bookings/check-conflict?${params.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      );
+
+      const hasConflict = await response.json();
+      
+      if (!hasConflict) {
+        setIsAvailable(true);
+        setAvailabilityMessage("✓ Time slot is available");
+        toast.success("Time slot is available!");
+      } else {
+        setIsAvailable(false);
+        setAvailabilityMessage("✗ Time slot is not available. Another booking exists at this time.");
+        toast.error("Time slot is not available");
+      }
+    } catch (error) {
+      console.error("Error checking availability:", error);
+      setIsAvailable(false);
+      setAvailabilityMessage("Error checking availability");
+      toast.error("Failed to check availability");
+    } finally {
+      setCheckingAvailability(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -79,7 +135,13 @@ const CreateBooking = () => {
       formData.purpose.trim().length < 10 ||
       !formData.expectedAttendees
     ) {
-      toast.error("Purpose must be at least 10 characters");
+      toast.error("Please fill all required fields. Purpose must be at least 10 characters");
+      return;
+    }
+
+    // Check if availability was verified
+    if (!isAvailable) {
+      toast.error("Please check availability first");
       return;
     }
 
@@ -92,7 +154,6 @@ const CreateBooking = () => {
     try {
       setLoading(true);
       
-      // Get auth token from localStorage
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Authentication token not found. Please login again.", { id: toastId });
@@ -127,7 +188,7 @@ const CreateBooking = () => {
       }
 
       toast.success("Booking created successfully!", { id: toastId });
-      setTimeout(() => navigate("/user/bookings"), 1500);
+      setTimeout(() => navigate("/user/bookings/dashboard"), 1500);
     } catch (error) {
       console.error("Error creating booking:", error);
       toast.error(error.message || "Failed to create booking", { id: toastId });
@@ -141,11 +202,11 @@ const CreateBooking = () => {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <button
-          onClick={() => navigate("/user/bookings")}
+          onClick={() => navigate("/user/bookings/dashboard")}
           className="flex items-center gap-2 text-purple-300 hover:text-purple-100 mb-8 transition-colors"
         >
           <ArrowLeft size={20} />
-          <span>Back to Bookings</span>
+          <span>Back to Dashboard</span>
         </button>
 
         {/* Title */}
@@ -215,31 +276,74 @@ const CreateBooking = () => {
             </div>
           </div>
 
-          {/* Time Slot Selection */}
+          {/* Time Selection */}
           {formData.bookingDate && formData.resourceId && (
             <div className="bg-slate-800 border border-purple-500 border-opacity-30 rounded-xl p-6 hover:border-opacity-60 transition-all">
               <label className="block text-sm font-semibold text-gray-300 mb-4">
                 Select Time Slot <span className="text-red-400">*</span>
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {timeSlots.map((slot, index) => {
-                  const isSelected = selectedSlot && selectedSlot[0] === slot[0] && selectedSlot[1] === slot[1];
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleTimeSlotSelect(slot)}
-                      className={`p-3 rounded-lg font-semibold transition-all ${
-                        isSelected
-                          ? "bg-purple-600 text-white border-2 border-purple-400"
-                          : "bg-slate-700 text-gray-300 border-2 border-purple-400 border-opacity-30 hover:border-opacity-60"
-                      }`}
-                    >
-                      {slot[0].substring(0, 5)} - {slot[1].substring(0, 5)}
-                    </button>
-                  );
-                })}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                {/* Start Time */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 mb-2">Start Time</label>
+                  <div className="relative">
+                    <input
+                      type="time"
+                      name="startTime"
+                      value={formData.startTime}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-slate-700 border border-purple-400 border-opacity-40 rounded-lg text-white focus:outline-none focus:border-purple-400 focus:border-opacity-100 transition-all"
+                      required
+                    />
+                    <Clock size={18} className="absolute right-3 top-3 text-purple-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* End Time */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 mb-2">End Time</label>
+                  <div className="relative">
+                    <input
+                      type="time"
+                      name="endTime"
+                      value={formData.endTime}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-slate-700 border border-purple-400 border-opacity-40 rounded-lg text-white focus:outline-none focus:border-purple-400 focus:border-opacity-100 transition-all"
+                      required
+                    />
+                    <Clock size={18} className="absolute right-3 top-3 text-purple-400 pointer-events-none" />
+                  </div>
+                </div>
               </div>
+
+              {/* Check Availability Button */}
+              <button
+                type="button"
+                onClick={checkAvailability}
+                disabled={checkingAvailability || !formData.startTime || !formData.endTime}
+                className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+              >
+                {checkingAvailability ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Checking...
+                  </>
+                ) : (
+                  "Check Availability"
+                )}
+              </button>
+
+              {/* Availability Status */}
+              {availabilityMessage && (
+                <div className={`mt-3 p-3 rounded-lg text-sm font-semibold ${
+                  isAvailable 
+                    ? "bg-green-900 bg-opacity-30 border border-green-500 text-green-300" 
+                    : "bg-red-900 bg-opacity-30 border border-red-500 text-red-300"
+                }`}>
+                  {availabilityMessage}
+                </div>
+              )}
             </div>
           )}
 
@@ -296,15 +400,15 @@ const CreateBooking = () => {
           <div className="flex gap-4 pt-4">
             <button
               type="button"
-              onClick={() => navigate("/user/bookings")}
+              onClick={() => navigate("/user/bookings/dashboard")}
               className="flex-1 px-6 py-3 border-2 border-gray-600 text-gray-300 hover:text-white hover:border-gray-400 rounded-lg font-semibold transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={loading || !isAvailable}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
