@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { commentService } from '../services/ticketService';
+import toast from 'react-hot-toast';
 
 const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
   const [comments, setComments] = useState([]);
@@ -9,7 +10,6 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     fetchComments();
@@ -40,10 +40,9 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
       setSubmitting(true);
       await commentService.addComment(ticketId, { content: newComment });
       setNewComment('');
-      setSuccessMessage('Comment added successfully');
+      toast.success('Comment added successfully');
       fetchComments();
       onCommentAdded?.();
-      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError('Failed to add comment');
       console.error(err);
@@ -67,9 +66,8 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
       setSubmitting(true);
       await commentService.updateComment(ticketId, commentId, { content: editingContent });
       setEditingCommentId(null);
-      setSuccessMessage('Comment updated successfully');
+      toast.success('Comment updated successfully');
       fetchComments();
-      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError('Failed to update comment');
       console.error(err);
@@ -84,9 +82,8 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
     try {
       setSubmitting(true);
       await commentService.deleteComment(ticketId, commentId);
-      setSuccessMessage('Comment deleted successfully');
+      toast.success('Comment deleted successfully');
       fetchComments();
-      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError('Failed to delete comment');
       console.error(err);
@@ -107,16 +104,6 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
   return (
     <div className="mt-8 border-t pt-6">
       <h3 className="text-2xl font-bold text-gray-800 mb-6">Activity & Comments</h3>
-
-      {/* Success Message */}
-      {successMessage && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 flex items-center gap-2">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-          {successMessage}
-        </div>
-      )}
 
       {/* Error Message */}
       {error && (

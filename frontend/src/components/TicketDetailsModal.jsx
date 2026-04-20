@@ -1,27 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { ticketService } from '../services/ticketService';
 import TicketCommentSection from './TicketCommentSection';
+import toast from 'react-hot-toast';
 
 const TicketDetailsModal = ({ ticket, isOpen, onClose, userEmail, userRoles, onTicketUpdated }) => {
   const [ticketData, setTicketData] = useState(ticket);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [newStatus, setNewStatus] = useState(ticket?.status);
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
+  const [technicians, setTechnicians] = useState([]);
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState(ticket?.assignedToId || '');
 
   useEffect(() => {
     setTicketData(ticket);
     setNewStatus(ticket?.status);
+    setSelectedTechnicianId(ticket?.assignedToId || '');
   }, [ticket]);
 
   const isAdmin = userRoles?.includes('ROLE_ADMIN');
   const isTechnician = userRoles?.includes('ROLE_TECHNICIAN');
   const isOwner = ticketData?.userId === userEmail || ticketData?.userEmail === userEmail;
 
+  useEffect(() => {
+    const fetchTechnicians = async () => {
+      if (!isAdmin || !isOpen) return;
+      try {
+        const users = await ticketService.getAdminUsers();
+        const technicianUsers = (users || []).filter(
+          (user) => Array.isArray(user.roles) && user.roles.includes('ROLE_TECHNICIAN')
+        );
+        setTechnicians(technicianUsers.slice(0, 2));
+      } catch (err) {
+        console.error('Failed to load technicians', err);
+      }
+    };
+    fetchTechnicians();
+  }, [isAdmin, isOpen]);
+
   const handleStatusChange = async () => {
+    if (newStatus === 'IN_PROGRESS' && isAdmin && !selectedTechnicianId) {
+      setError('Please select a technician before setting status to IN PROGRESS');
+      return;
+    }
+
     const statusChangeData = {
       status: newStatus,
     };
@@ -41,11 +65,16 @@ const TicketDetailsModal = ({ ticket, isOpen, onClose, userEmail, userRoles, onT
 
     try {
       setIsUpdatingStatus(true);
+      setError('');
+
+      if (newStatus === 'IN_PROGRESS' && isAdmin && selectedTechnicianId) {
+        await ticketService.assignTicket(ticketData.id, selectedTechnicianId);
+      }
+
       const updated = await ticketService.updateTicketStatus(ticketData.id, statusChangeData);
       setTicketData(updated);
-      setSuccessMessage('Ticket status updated successfully');
+      toast.success('Ticket status updated successfully');
       onTicketUpdated?.();
-      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       setError('Failed to update ticket status');
       console.error(err);
@@ -92,13 +121,10 @@ const TicketDetailsModal = ({ ticket, isOpen, onClose, userEmail, userRoles, onT
     const icons = {
       ELECTRICAL: '⚡',
       PLUMBING: '🔧',
-      HVAC: '❄️',
-      FURNITURE: '🪑',
-      EQUIPMENT: '🖥️',
+      ACADEMIC: '🖥️',
       CLEANING: '🧹',
       SECURITY: '🔐',
       IT_SUPPORT: '💻',
-      STRUCTURAL: '🏗️',
       OTHER: '📋',
     };
     return icons[category] || '📋';
@@ -146,15 +172,6 @@ const TicketDetailsModal = ({ ticket, isOpen, onClose, userEmail, userRoles, onT
         {/* Content */}
         <div className="p-6">
           {/* Messages */}
-          {successMessage && (
-            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              {successMessage}
-            </div>
-          )}
-
           {error && (
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
               {error}
@@ -182,6 +199,20 @@ const TicketDetailsModal = ({ ticket, isOpen, onClose, userEmail, userRoles, onT
                   </div>
                 </div>
               </div>
+
+              {(isAdmin || isTechnician) && (
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Assigned Technician</p>
+                  {ticketData.assignedToName ? (
+                    <>
+                      <p className="text-gray-800 font-medium">{ticketData.assignedToName}</p>
+                      <p className="text-sm text-gray-600">{ticketData.assignedToEmail}</p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-600">Not assigned yet</p>
+                  )}
+                </div>
+              )}
 
               {/* Category */}
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -317,6 +348,22 @@ const TicketDetailsModal = ({ ticket, isOpen, onClose, userEmail, userRoles, onT
                     )}
                   </select>
 
+                  {isAdmin && newStatus === 'IN_PROGRESS' && (
+                    <select
+                      value={selectedTechnicianId}
+                      onChange={(e) => setSelectedTechnicianId(e.target.value)}
+                      disabled={isUpdatingStatus}
+                      className="w-full px-3 py-2 border border-purple-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      <option value="">Select Technician</option>
+                      {technicians.map((tech) => (
+                        <option key={tech.id} value={tech.id}>
+                          {tech.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
                   {newStatus === 'RESOLVED' && (
                     <textarea
                       value={resolutionNotes}
@@ -339,7 +386,11 @@ const TicketDetailsModal = ({ ticket, isOpen, onClose, userEmail, userRoles, onT
 
                   <button
                     onClick={handleStatusChange}
-                    disabled={isUpdatingStatus || newStatus === ticketData.status}
+                    disabled={
+                      isUpdatingStatus ||
+                      (newStatus === ticketData.status &&
+                        (newStatus !== 'IN_PROGRESS' || selectedTechnicianId === ticketData.assignedToId))
+                    }
                     className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                   >
                     {isUpdatingStatus ? 'Updating...' : 'Update Status'}

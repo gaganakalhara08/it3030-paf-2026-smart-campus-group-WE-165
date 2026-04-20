@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { ticketService } from '../services/ticketService';
+import toast from 'react-hot-toast';
 
 const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
+  const DEFAULT_RESOURCE = {
+    resourceId: 'N/A',
+    resourceName: 'General Support',
+    resourceLocation: 'Not specified',
+  };
+
   const [formData, setFormData] = useState({
-    resourceId: '',
-    resourceName: '',
-    resourceLocation: '',
+    ...DEFAULT_RESOURCE,
     title: '',
     description: '',
     category: 'OTHER',
@@ -17,18 +22,14 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
   const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
 
   const categories = [
     'ELECTRICAL',
     'PLUMBING',
-    'HVAC',
-    'FURNITURE',
-    'EQUIPMENT',
     'CLEANING',
     'SECURITY',
     'IT_SUPPORT',
-    'STRUCTURAL',
+    'ACADEMIC',
     'OTHER',
   ];
 
@@ -48,20 +49,34 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
 
     const maxAttachments = 3;
     const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/png', 'image/jpeg'];
 
     if (attachments.length >= maxAttachments) {
-      setError(`Maximum ${maxAttachments} attachments allowed`);
+      const message = `Maximum ${maxAttachments} attachments allowed`;
+      setError(message);
+      toast.error(message);
       return;
     }
 
     for (let file of files) {
       if (attachments.length >= maxAttachments) {
-        setError(`Maximum ${maxAttachments} attachments allowed`);
+        const message = `Maximum ${maxAttachments} attachments allowed`;
+        setError(message);
+        toast.error(message);
         break;
       }
 
+      if (!allowedTypes.includes(file.type)) {
+        const message = `${file.name}: only PNG and JPG images are allowed`;
+        setError(message);
+        toast.error(message);
+        continue;
+      }
+
       if (file.size > maxSize) {
-        setError(`File ${file.name} is too large. Maximum 5MB allowed`);
+        const message = `File ${file.name} is too large. Maximum 5MB allowed`;
+        setError(message);
+        toast.error(message);
         continue;
       }
 
@@ -91,54 +106,63 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccessMessage('');
 
     if (
-      !formData.resourceId.trim() ||
-      !formData.resourceName.trim() ||
-      !formData.resourceLocation.trim() ||
       !formData.title.trim() ||
       !formData.description.trim() ||
-      !formData.contactEmail.trim()
+      !formData.contactEmail.trim() ||
+      !formData.contactPhone.trim()
     ) {
-      setError('Please fill in all required fields');
+      const message = 'Please fill in all required fields';
+      setError(message);
+      toast.error(message);
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.contactEmail)) {
-      setError('Please enter a valid email address');
+      const message = 'Please enter a valid email address';
+      setError(message);
+      toast.error(message);
+      return;
+    }
+
+    const contactNumber = formData.contactPhone.trim();
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(contactNumber)) {
+      const message = 'Contact number must be exactly 10 digits';
+      setError(message);
+      toast.error(message);
       return;
     }
 
     try {
       setLoading(true);
       const submitData = {
+        ...DEFAULT_RESOURCE,
         ...formData,
         attachments: attachments,
       };
 
       await ticketService.createTicket(submitData);
-      setSuccessMessage('Ticket created successfully!');
-      setTimeout(() => {
-        onTicketCreated();
-        onClose();
-        setFormData({
-          resourceId: '',
-          resourceName: '',
-          resourceLocation: '',
-          title: '',
-          description: '',
-          category: 'OTHER',
-          priority: 'MEDIUM',
-          contactEmail: '',
-          contactPhone: '',
-        });
-        setAttachments([]);
-      }, 1500);
+      toast.success('Ticket created successfully!');
+      onTicketCreated();
+      onClose();
+      setFormData({
+        ...DEFAULT_RESOURCE,
+        title: '',
+        description: '',
+        category: 'OTHER',
+        priority: 'MEDIUM',
+        contactEmail: '',
+        contactPhone: '',
+      });
+      setAttachments([]);
     } catch (err) {
-      setError(err.message || 'Failed to create ticket');
+      const message = err.message || 'Failed to create ticket';
+      setError(message);
+      toast.error(message);
       console.error(err);
     } finally {
       setLoading(false);
@@ -166,16 +190,6 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
 
         {/* Content */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Success Message */}
-          {successMessage && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              {successMessage}
-            </div>
-          )}
-
           {/* Error Message */}
           {error && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
@@ -185,57 +199,6 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
 
           {/* Two Column Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Resource ID */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Resource ID <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="resourceId"
-                value={formData.resourceId}
-                onChange={handleInputChange}
-                placeholder="e.g., RES-001"
-                required
-                disabled={loading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Resource Name */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Resource Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="resourceName"
-                value={formData.resourceName}
-                onChange={handleInputChange}
-                placeholder="e.g., Lab Projector A"
-                required
-                disabled={loading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Resource Location */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Location <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="resourceLocation"
-                value={formData.resourceLocation}
-                onChange={handleInputChange}
-                placeholder="e.g., Building A, Room 102"
-                required
-                disabled={loading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
             {/* Category */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -298,14 +261,17 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
             {/* Contact Phone */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Contact Phone
+                Contact Phone <span className="text-red-500">*</span>
               </label>
               <input
                 type="tel"
                 name="contactPhone"
                 value={formData.contactPhone}
                 onChange={handleInputChange}
-                placeholder="+1234567890"
+                placeholder="10 digit number"
+                pattern="\d{10}"
+                maxLength={10}
+                required
                 disabled={loading}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -355,7 +321,7 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
               <input
                 type="file"
                 multiple
-                accept="image/*"
+                accept=".png,.jpg,.jpeg,image/png,image/jpeg"
                 onChange={handleFileUpload}
                 disabled={loading || attachments.length >= 3}
                 className="absolute inset-0 opacity-0 cursor-pointer"
@@ -364,7 +330,7 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <p className="text-gray-700 font-medium">Upload images as evidence</p>
-              <p className="text-sm text-gray-500">PNG, JPG, GIF up to 5MB each</p>
+              <p className="text-sm text-gray-500">PNG, JPG up to 5MB each</p>
               <p className="text-xs text-gray-400 mt-1">
                 {attachments.length} / 3 attachments
               </p>

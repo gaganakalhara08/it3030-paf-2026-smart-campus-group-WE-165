@@ -90,6 +90,17 @@ export const ticketService = {
     }
   },
 
+  getAdminUsers: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/admin/users`, {
+        headers: getHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
   // UPDATE - Status updates (Admin/Technician)
   updateTicketStatus: async (ticketId, statusData) => {
     try {

@@ -67,23 +67,6 @@ const TicketAllView = ({ userEmail, userName }) => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'OPEN':
-        return 'bg-blue-50 border-l-4 border-blue-500';
-      case 'IN_PROGRESS':
-        return 'bg-purple-50 border-l-4 border-purple-500';
-      case 'RESOLVED':
-        return 'bg-green-50 border-l-4 border-green-500';
-      case 'CLOSED':
-        return 'bg-gray-50 border-l-4 border-gray-500';
-      case 'REJECTED':
-        return 'bg-red-50 border-l-4 border-red-500';
-      default:
-        return 'bg-gray-50 border-l-4 border-gray-500';
-    }
-  };
-
   const getStatusBadgeColor = (status) => {
     switch (status) {
       case 'OPEN':
@@ -242,103 +225,68 @@ const TicketAllView = ({ userEmail, userName }) => {
           <p className="text-gray-500 mt-1">Try adjusting your search or filter criteria</p>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {filteredTickets.map((ticket) => (
-            <div
-              key={ticket.id}
-              onClick={() => handleViewTicket(ticket.id)}
-              className={`p-5 rounded-lg border-2 cursor-pointer transition-all hover:shadow-lg ${getStatusColor(ticket.status)}`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  {/* Title and ID */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">{getCategoryEmoji(ticket.category)}</span>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900">{ticket.title}</h3>
-                      <p className="text-sm text-gray-600">ID: {ticket.id}</p>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-gray-700 mb-3 line-clamp-2">{ticket.description}</p>
-
-                  {/* Badges */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <p className="text-sm font-medium pt-1">Status :-</p>
-                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(ticket.status)}`}> 
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
+          <table className="w-full min-w-[1100px] text-sm">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                {/* <th className="p-3 text-left">TICKET ID</th> */}
+                <th className="p-3 text-left">SUBJECT</th>
+                <th className="p-3 text-left">CATEGORY</th>
+                <th className="p-3 text-left">STATUS</th>
+                <th className="p-3 text-left">PRIORITY</th>
+                <th className="p-3 text-left">REPORTER</th>
+                <th className="p-3 text-left">RESOURCE</th>
+                <th className="p-3 text-left">TECHNICIAN</th>
+                <th className="p-3 text-left">CREATED</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTickets.map((ticket) => (
+                <tr
+                  key={ticket.id}
+                  onClick={() => handleViewTicket(ticket.id)}
+                  className="border-t hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  {/* <td className="p-3 font-medium text-blue-700">{ticket.id}</td> */}
+                  <td className="p-3">
+                    <p className="font-semibold text-gray-900">{ticket.title}</p>
+                    <p className="text-xs text-gray-500 truncate max-w-[220px]">
+                      {ticket.description}
+                    </p>
+                  </td>
+                  <td className="p-3">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                      <span>{getCategoryEmoji(ticket.category)}</span>
+                      <span>{ticket.category.replace('_', ' ')}</span>
+                    </span>
+                  </td>
+                  <td className="p-3">
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(ticket.status)}`}>
                       {ticket.status.replace('_', ' ')}
                     </span>
-                    <p className="text-sm font-medium pt-1">Priority :-</p>
-                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${getPriorityColor(ticket.priority)}`}>
+                  </td>
+                  <td className="p-3">
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getPriorityColor(ticket.priority)}`}>
                       {ticket.priority}
                     </span>
-                    <p className="text-sm font-medium pt-1">Ticket Catagory :-</p>
-                    <span className="inline-block px-3 py-1 rounded-full text-sm text-gray-600 bg-gray-200">
-                      {ticket.category.replace('_', ' ')}
-                    </span>
-                  </div>
-
-                  {/* Info Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-3">
-                    <div>
-                      <p className="text-gray-600">Reporter</p>
-                      <p className="font-medium text-gray-900">{ticket.userName}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Resource</p>
-                      <p className="font-medium text-gray-900">{ticket.resourceName}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Location</p>
-                      <p className="font-medium text-gray-900">{ticket.resourceLocation}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Created</p>
-                      <p className="font-medium text-gray-900">{formatDate(ticket.createdAt)}</p>
-                    </div>
-                  </div>
-
-                  {/* Assignment and Comments */}
-                  <div className="flex flex-wrap gap-3 items-center">
+                  </td>
+                  <td className="p-3 text-gray-800">{ticket.userName}</td>
+                  <td className="p-3">
+                    <p className="font-medium text-gray-800">{ticket.resourceName}</p>
+                    <p className="text-xs text-gray-500">{ticket.resourceLocation}</p>
+                  </td>
+                  <td className="p-3">
                     {ticket.assignedToName ? (
-                      <div className="px-3 py-1 bg-blue-100 rounded-lg text-sm text-blue-800 font-medium">
-                        👤 Assigned: {ticket.assignedToName}
-                      </div>
+                      <span className="text-blue-700 font-medium">{ticket.assignedToName}</span>
                     ) : (
-                      <div className="px-3 py-1 bg-yellow-100 rounded-lg text-sm text-yellow-800 font-medium">
-                        ⚠️ Unassigned
-                      </div>
+                      <span className="text-yellow-700 font-medium">Unassigned</span>
                     )}
-                    <div className="text-sm text-gray-600">
-                      💬 Comments: <span className="font-semibold">{ticket.comments?.length || 0}</span>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      📎 Attachments: <span className="font-semibold">{ticket.attachments?.length || 0}</span>
-                    </div>
-                  </div>
-
-                  {/* Rejection Reason Badge */}
-                  {ticket.rejectionReason && (
-                    <div className="mt-3 p-2 bg-red-100 rounded-lg border border-red-300">
-                      <p className="text-sm text-red-800">
-                        <span className="font-semibold">Rejected:</span> {ticket.rejectionReason}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Action Arrow */}
-                <div className="ml-4 flex-shrink-0 text-right">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white/50 text-blue-600 hover:bg-white transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td className="p-3 text-gray-600">{formatDate(ticket.createdAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

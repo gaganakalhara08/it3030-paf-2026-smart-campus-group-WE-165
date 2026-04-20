@@ -154,8 +154,12 @@ const TicketStudentView = ({ userEmail }) => {
         >
           <option value="ALL">All Categories</option>
           <option value="ACADEMIC">Academic</option>
-          <option value="IT">IT</option>
-          <option value="FINANCE">Finance</option>
+          <option value="IT_SUPPORT">IT Support</option>
+          <option value="ELECTRICAL">Electrical</option>
+          <option value="PLUMBING">Plumbing</option>
+          <option value="CLEANING">Cleaning</option>
+          <option value="SECURITY">Sequrity</option>
+          <option value="OTHER">Other</option>
         </select>
 
         <select
@@ -178,6 +182,7 @@ const TicketStudentView = ({ userEmail }) => {
               <th className="p-3 text-left">SUBJECT</th>
               <th className="p-3 text-left">CATEGORY</th>
               <th className="p-3 text-left">STATUS</th>
+              <th className="p-3 text-left">TECHNICIAN</th>
               <th className="p-3 text-left">LAST UPDATE</th>
             </tr>
           </thead>
@@ -210,6 +215,10 @@ const TicketStudentView = ({ userEmail }) => {
                   ● {ticket.status.replace('_', ' ')}
                 </td>
 
+                <td className="p-3 text-gray-700">
+                  {ticket.assignedToName || 'Unassigned'}
+                </td>
+
                 <td className="p-3 text-gray-500">
                   {formatDate(ticket.updatedAt || ticket.createdAt)}
                 </td>
@@ -229,6 +238,7 @@ const TicketStudentView = ({ userEmail }) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         userEmail={userEmail}
+        onTicketUpdated={fetchTickets}
       />
 
       <CreateTicketModal

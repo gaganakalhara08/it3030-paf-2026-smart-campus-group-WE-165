@@ -4,6 +4,7 @@ import com.smartcampus.paf.model.enums.TicketCategory;
 import com.smartcampus.paf.model.enums.TicketPriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import java.util.List;
 
@@ -34,6 +35,8 @@ public class CreateTicketRequestDTO {
     @NotBlank(message = "Contact email is required")
     private String contactEmail;
     
+    @NotBlank(message = "Contact number is required")
+    @Pattern(regexp = "^\\d{10}$", message = "Contact number must be exactly 10 digits")
     private String contactPhone;
     
     // List of base64 encoded image data with metadata

@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,9 +138,25 @@ public class TicketServiceImpl implements TicketService {
     public TicketResponseDTO createTicket(CreateTicketRequestDTO request, String userEmail) {
         User user = getUserByEmail(userEmail);
         
+        // Validate contact number format (defense in depth in addition to DTO validation)
+        if (request.getContactPhone() == null || !request.getContactPhone().matches("^\\d{10}$")) {
+            throw new InvalidTicketOperationException("Contact number must be exactly 10 digits");
+        }
+
         // Validate attachment count (max 3)
         if (request.getAttachments() != null && request.getAttachments().size() > 3) {
             throw new InvalidTicketOperationException("Maximum 3 attachments allowed per ticket");
+        }
+
+        // Validate attachment file types (PNG/JPG only)
+        Set<String> allowedMimeTypes = Set.of("image/png", "image/jpeg");
+        if (request.getAttachments() != null) {
+            request.getAttachments().forEach(attachmentDTO -> {
+                if (attachmentDTO.getFileType() == null ||
+                        !allowedMimeTypes.contains(attachmentDTO.getFileType().toLowerCase())) {
+                    throw new InvalidTicketOperationException("Only PNG and JPG images are allowed");
+                }
+            });
         }
         
         Ticket ticket = new Ticket();
