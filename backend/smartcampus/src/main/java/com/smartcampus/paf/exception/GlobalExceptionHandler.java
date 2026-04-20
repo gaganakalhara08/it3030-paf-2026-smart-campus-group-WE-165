@@ -1,6 +1,5 @@
 package com.smartcampus.paf.exception;
 
-import com.smartcampus.paf.dto.response.ErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

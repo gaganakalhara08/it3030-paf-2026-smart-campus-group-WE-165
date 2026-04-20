@@ -45,6 +45,7 @@ public class Resource {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private ResourceStatus status = ResourceStatus.ACTIVE;
 
     // Optional extra metadata

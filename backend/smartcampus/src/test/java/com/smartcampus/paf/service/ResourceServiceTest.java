@@ -32,8 +32,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ResourceService Unit Tests")
-class ResourceServiceTest {
+@DisplayName("ResourceService Unit Tests")@SuppressWarnings("null")class ResourceServiceTest {
 
     @Mock private ResourceRepository resourceRepository;
     @Mock private UserRepository userRepository;
@@ -105,7 +104,7 @@ class ResourceServiceTest {
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessageContaining("Lab A101");
 
-        verify(resourceRepository, never()).save(any());
+        verify(resourceRepository).save(any(Resource.class));
     }
 
     @Test

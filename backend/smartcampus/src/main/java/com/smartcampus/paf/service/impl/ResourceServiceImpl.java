@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ResourceServiceImpl implements ResourceService {
 
     private final ResourceRepository resourceRepository;
