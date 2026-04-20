@@ -18,111 +18,46 @@ import UserManagement from "../pages/admin/user/UserManagement";
 import AdminFacilitiesPage from "../pages/admin/resource/AdminFacilitiesPage";
 import UserResourceCatalogue from "../pages/user/resource/UserResourceCatalogue";
 
-const AppRoutes = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login"  element={<Login />} />
-        <Route path="/"       element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+// ── Module A Special Features
+import AdminResourceAnalytics from "../pages/admin/resource/AdminResourceAnalytics";
 
-        {/* Generic dashboard (redirects by role) */}
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+const wrap = (Component) => (
+  <ProtectedRoute><Component /></ProtectedRoute>
+);
 
-        {/* ── Admin routes ── */}
-        <Route path="/admin/dashboard"  
-               element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-           />
+const AppRoutes = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/login"  element={<Login />} />
+      <Route path="/"       element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
-        <Route path="/admin/bookings"   
-               element={
-                <ProtectedRoute>
-                  <AdminBookingDashboard />
-                </ProtectedRoute>
-              } 
-          />
+      {/* Generic dashboard */}
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-        <Route path="/admin/analytics"  
-               element={
-                <ProtectedRoute>
-                  <AdminAnalyticsDashboard />
-                </ProtectedRoute>
-               }
-           />
+      {/* ── Admin routes ── */}
+      <Route path="/admin/dashboard"          element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/bookings"           element={<ProtectedRoute><AdminBookingDashboard /></ProtectedRoute>} />
+      <Route path="/admin/analytics"          element={<ProtectedRoute><AdminAnalyticsDashboard /></ProtectedRoute>} />
+      <Route path="/admin/users"              element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
 
-        <Route path="/admin/users"      
-               element={
-                <ProtectedRoute>
-                  <UserManagement />
-                </ProtectedRoute>
-              } 
-           />
+      {/* Module A — Facilities Management */}
+      <Route path="/admin/facilities"         element={<ProtectedRoute><AdminFacilitiesPage /></ProtectedRoute>} />
 
-        {/* Module A — Admin Facilities Management */}
-        <Route path="/admin/facilities" 
-               element={
-                <ProtectedRoute>
-                  <AdminFacilitiesPage />
-                </ProtectedRoute>
-              } 
-          />
+      {/* Module A Special Feature 1 — Resource Analytics */}
+      <Route path="/admin/resource-analytics" element={<ProtectedRoute><AdminResourceAnalytics /></ProtectedRoute>} />
 
-        {/* ── User routes ── */}
-        <Route path="/user/dashboard"              
-               element={
-                <ProtectedRoute>
-                  <UserDashboard />
-                </ProtectedRoute>
-            } 
-         />
+      {/* ── User routes ── */}
+      <Route path="/user/dashboard"              element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
+      <Route path="/user/bookings/dashboard"     element={<ProtectedRoute><BookingDashboard /></ProtectedRoute>} />
+      <Route path="/user/bookings/create"        element={<ProtectedRoute><CreateBooking /></ProtectedRoute>} />
+      <Route path="/user/bookings/:id/check-in"  element={<ProtectedRoute><BookingCheckIn /></ProtectedRoute>} />
+      <Route path="/user/bookings/:id"           element={<ProtectedRoute><BookingDetails /></ProtectedRoute>} />
 
-        <Route path="/user/bookings/dashboard"     
-               element={
-                <ProtectedRoute>
-                  <BookingDashboard />
-                </ProtectedRoute>
-              } 
-         />
-
-        <Route path="/user/bookings/create"        
-               element={
-                <ProtectedRoute>
-                  <CreateBooking />
-                </ProtectedRoute>
-              } 
-         />
-
-        <Route path="/user/bookings/:id/check-in"  
-               element={
-                <ProtectedRoute>
-                  <BookingCheckIn />
-                </ProtectedRoute>
-              } 
-         />
-        <Route path="/user/bookings/:id"           
-               element={
-                <ProtectedRoute>
-                  <BookingDetails />
-                </ProtectedRoute>
-              } 
-         />
-
-        {/* Module A — User Resource Catalogue */}
-        <Route path="/user/resources" 
-               element={
-                <ProtectedRoute>
-                  <UserResourceCatalogue />
-                </ProtectedRoute>
-              } 
-         />
-         
-      </Routes>
-    </BrowserRouter>
-  );
-};
+      {/* Module A — User Resource Catalogue (Feature 3 calendar is inside the detail modal) */}
+      <Route path="/user/resources"              element={<ProtectedRoute><UserResourceCatalogue /></ProtectedRoute>} />
+    </Routes>
+  </BrowserRouter>
+);
 
 export default AppRoutes;

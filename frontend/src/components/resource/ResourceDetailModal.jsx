@@ -2,6 +2,7 @@ import React from "react";
 import { X, MapPin, Users, Clock, Building2, Cpu, Calendar, User } from "lucide-react";
 import ResourceStatusBadge from "./ResourceStatusBadge";
 import ResourceTypeBadge from "./ResourceTypeBadge";
+import ResourceAvailabilityCalendar from "./ResourceAvailabilityCalendar";
 
 const Row = ({ icon: Icon, label, value }) =>
   value ? (
@@ -19,13 +20,15 @@ const Row = ({ icon: Icon, label, value }) =>
 const ResourceDetailModal = ({ resource, isOpen, onClose, onBookNow, isAdmin, onEdit }) => {
   if (!isOpen || !resource) return null;
 
-  const formattedDate = (s) => s ? new Date(s).toLocaleDateString("en-LK", { dateStyle: "medium" }) : "—";
+  const formattedDate = (s) =>
+    s ? new Date(s).toLocaleDateString("en-LK", { dateStyle: "medium" }) : "—";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-start justify-between rounded-t-2xl">
+        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-start justify-between rounded-t-2xl z-10">
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-1">
               <ResourceTypeBadge type={resource.type} />
@@ -33,7 +36,8 @@ const ResourceDetailModal = ({ resource, isOpen, onClose, onBookNow, isAdmin, on
             </div>
             <h2 className="text-xl font-bold text-slate-800 leading-tight">{resource.name}</h2>
           </div>
-          <button onClick={onClose} className="ml-4 p-2 rounded-xl text-slate-400 hover:bg-slate-100 transition-colors flex-shrink-0">
+          <button onClick={onClose}
+            className="ml-4 p-2 rounded-xl text-slate-400 hover:bg-slate-100 transition-colors flex-shrink-0">
             <X size={20} />
           </button>
         </div>
@@ -41,26 +45,30 @@ const ResourceDetailModal = ({ resource, isOpen, onClose, onBookNow, isAdmin, on
         {/* Image */}
         {resource.imageUrl && (
           <div className="w-full h-44 bg-slate-100 overflow-hidden">
-            <img src={resource.imageUrl} alt={resource.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = "none"; }} />
+            <img src={resource.imageUrl} alt={resource.name}
+              className="w-full h-full object-cover"
+              onError={(e) => { e.target.style.display = "none"; }} />
           </div>
         )}
 
         <div className="p-6 space-y-1">
           <Row icon={Building2} label="Building / Location"
-            value={[resource.building, resource.floor ? `Floor ${resource.floor}` : null, resource.roomNumber].filter(Boolean).join(" · ")} />
-          <Row icon={MapPin}     label="Full Location"   value={resource.location} />
-          <Row icon={Users}      label="Capacity"        value={`${resource.capacity} persons`} />
-          <Row icon={Clock}      label="Availability"    value={`${resource.availabilityStart?.slice(0,5)} – ${resource.availabilityEnd?.slice(0,5)}`} />
+            value={[resource.building,
+              resource.floor ? `Floor ${resource.floor}` : null,
+              resource.roomNumber].filter(Boolean).join(" · ")} />
+          <Row icon={MapPin}    label="Full Location"  value={resource.location} />
+          <Row icon={Users}     label="Capacity"       value={`${resource.capacity} persons`} />
+          <Row icon={Clock}     label="Availability"   value={`${resource.availabilityStart?.slice(0,5)} – ${resource.availabilityEnd?.slice(0,5)}`} />
 
           {resource.type === "EQUIPMENT" && (
             <>
-              <Row icon={Cpu} label="Brand / Model"   value={[resource.brand, resource.model].filter(Boolean).join(" · ")} />
-              <Row icon={Cpu} label="Serial Number"   value={resource.serialNumber} />
+              <Row icon={Cpu} label="Brand / Model"  value={[resource.brand, resource.model].filter(Boolean).join(" · ")} />
+              <Row icon={Cpu} label="Serial Number"  value={resource.serialNumber} />
             </>
           )}
 
-          <Row icon={Calendar}  label="Added On"       value={formattedDate(resource.createdAt)} />
-          <Row icon={User}      label="Added By"       value={resource.createdByName} />
+          <Row icon={Calendar} label="Added On"  value={formattedDate(resource.createdAt)} />
+          <Row icon={User}     label="Added By"  value={resource.createdByName} />
 
           {resource.description && (
             <div className="pt-3">
@@ -68,6 +76,9 @@ const ResourceDetailModal = ({ resource, isOpen, onClose, onBookNow, isAdmin, on
               <p className="text-sm text-slate-600 leading-relaxed">{resource.description}</p>
             </div>
           )}
+
+          {/* ── Feature 3: Availability Calendar ── */}
+          <ResourceAvailabilityCalendar resource={resource} />
         </div>
 
         {/* Actions */}

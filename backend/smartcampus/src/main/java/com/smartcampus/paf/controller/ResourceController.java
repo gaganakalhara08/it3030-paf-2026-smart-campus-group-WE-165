@@ -1,6 +1,8 @@
 package com.smartcampus.paf.controller;
 
 import com.smartcampus.paf.dto.request.ResourceRequestDTO;
+import com.smartcampus.paf.dto.response.DayAvailabilityDTO;
+import com.smartcampus.paf.dto.response.ResourceAnalyticsDTO;
 import com.smartcampus.paf.dto.response.ResourceResponseDTO;
 import com.smartcampus.paf.model.enums.ResourceStatus;
 import com.smartcampus.paf.model.enums.ResourceType;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,19 +21,21 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 /**
  * ResourceController — Module A: Facilities & Assets Catalogue
  *
- * Endpoints:
- *   POST   /api/resources                          (ADMIN) Create resource
- *   GET    /api/resources                          (ALL)   Search/filter resources
- *   GET    /api/resources/{id}                     (ALL)   Get resource by ID
- *   PUT    /api/resources/{id}                     (ADMIN) Full update resource
- *   PATCH  /api/resources/{id}/status              (ADMIN) Update status only
- *   DELETE /api/resources/{id}                     (ADMIN) Delete resource
- *   GET    /api/resources/stats                    (ADMIN) Get catalogue stats
+ * POST   /api/resources                        (ADMIN) Create resource
+ * GET    /api/resources                        (ALL)   Search/filter resources
+ * GET    /api/resources/stats                  (ADMIN) Catalogue counts
+ * GET    /api/resources/analytics              (ADMIN) Usage analytics — Feature 1
+ * GET    /api/resources/{id}                   (ALL)   Get single resource
+ * GET    /api/resources/{id}/availability      (ALL)   Day availability — Feature 3
+ * PUT    /api/resources/{id}                   (ADMIN) Full update
+ * PATCH  /api/resources/{id}/status            (ADMIN) Status-only update
+ * DELETE /api/resources/{id}                   (ADMIN) Delete
  */
 @RestController
 @RequestMapping("/api/resources")
@@ -39,23 +44,17 @@ public class ResourceController {
 
     private final ResourceService resourceService;
 
-    // ─────────────────────────────────────────────────────────────
-    // POST /api/resources — Create a new resource (ADMIN only)
-    // ─────────────────────────────────────────────────────────────
+    // ── POST /api/resources ───────────────────────────────────────────────────
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResourceResponseDTO> createResource(
             @Valid @RequestBody ResourceRequestDTO dto,
             @AuthenticationPrincipal UserDetails userDetails) {
-
-        ResourceResponseDTO response = resourceService.createResource(dto, userDetails.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(resourceService.createResource(dto, userDetails.getUsername()));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // GET /api/resources — Search & filter catalogue (all authenticated users)
-    // Supports: type, status, minCapacity, location, keyword, page, size, sort
-    // ─────────────────────────────────────────────────────────────
+    // ── GET /api/resources ────────────────────────────────────────────────────
     @GetMapping
     public ResponseEntity<Page<ResourceResponseDTO>> searchResources(
             @RequestParam(required = false) ResourceType type,
@@ -63,74 +62,71 @@ public class ResourceController {
             @RequestParam(required = false) Integer minCapacity,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "0")    int page,
+            @RequestParam(defaultValue = "12")   int size,
             @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir) {
+            @RequestParam(defaultValue = "asc")  String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
-
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ResourceResponseDTO> result = resourceService.searchResources(
-                type, status, minCapacity, location, keyword, pageable);
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(
+                resourceService.searchResources(type, status, minCapacity, location, keyword, pageable));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // GET /api/resources/stats — Catalogue statistics (ADMIN)
-    // Must be defined BEFORE /{id} to avoid route conflict
-    // ─────────────────────────────────────────────────────────────
+    // ── GET /api/resources/stats ──────────────────────────────────────────────
+    // Defined before /{id} to avoid route conflict
     @GetMapping("/stats")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Long>> getResourceStats() {
         return ResponseEntity.ok(resourceService.getResourceStats());
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // GET /api/resources/{id} — Get single resource by ID
-    // ─────────────────────────────────────────────────────────────
+    // ── GET /api/resources/analytics  (Feature 1) ────────────────────────────
+    @GetMapping("/analytics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResourceAnalyticsDTO> getAnalytics() {
+        return ResponseEntity.ok(resourceService.getAnalytics());
+    }
+
+    // ── GET /api/resources/{id} ───────────────────────────────────────────────
     @GetMapping("/{id}")
     public ResponseEntity<ResourceResponseDTO> getResourceById(@PathVariable String id) {
         return ResponseEntity.ok(resourceService.getResourceById(id));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // PUT /api/resources/{id} — Full update (ADMIN only)
-    // ─────────────────────────────────────────────────────────────
+    // ── GET /api/resources/{id}/availability  (Feature 3) ────────────────────
+    @GetMapping("/{id}/availability")
+    public ResponseEntity<DayAvailabilityDTO> getDayAvailability(
+            @PathVariable String id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(resourceService.getDayAvailability(id, date));
+    }
+
+    // ── PUT /api/resources/{id} ───────────────────────────────────────────────
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResourceResponseDTO> updateResource(
             @PathVariable String id,
             @Valid @RequestBody ResourceRequestDTO dto) {
-
         return ResponseEntity.ok(resourceService.updateResource(id, dto));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // PATCH /api/resources/{id}/status — Update status only (ADMIN)
-    // ─────────────────────────────────────────────────────────────
+    // ── PATCH /api/resources/{id}/status ─────────────────────────────────────
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResourceResponseDTO> updateResourceStatus(
             @PathVariable String id,
             @RequestParam ResourceStatus status) {
-
         return ResponseEntity.ok(resourceService.updateResourceStatus(id, status));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // DELETE /api/resources/{id} — Delete resource (ADMIN only)
-    // ─────────────────────────────────────────────────────────────
+    // ── DELETE /api/resources/{id} ────────────────────────────────────────────
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> deleteResource(@PathVariable String id) {
         resourceService.deleteResource(id);
-        return ResponseEntity.ok(Map.of(
-                "message", "Resource deleted successfully",
-                "id", id
-        ));
+        return ResponseEntity.ok(Map.of("message", "Resource deleted successfully", "id", id));
     }
 }
