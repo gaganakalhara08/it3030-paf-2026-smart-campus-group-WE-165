@@ -20,7 +20,6 @@ import TicketAllView from "../pages/TicketAllView";
 import CreateTicketModal from "../components/CreateTicketModal";
 
 import Signup from "../pages/Signup";
-import UserManagement from "../pages/admin/user/UserManagement";
 
 const AppRoutes = () => {
   return (
@@ -28,6 +27,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         
         {/* Protected Routes */}
         <Route 
@@ -163,14 +163,6 @@ const AppRoutes = () => {
           } 
         />
 
-        <Route 
-          path="/admin/users" 
-          element={
-            <ProtectedRoute>
-              <UserManagement />
-            </ProtectedRoute>
-          } 
-        />
         
       </Routes>
     </BrowserRouter>

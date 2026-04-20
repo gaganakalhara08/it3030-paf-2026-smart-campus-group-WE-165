@@ -14,8 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Set;
-import com.smartcampus.paf.model.enums.Role;
 
 @Component
 @RequiredArgsConstructor
@@ -41,12 +39,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             newUser.setEmail(email);
             newUser.setName(name);
             newUser.setPictureUrl(picture);
-
-            Set<Role> roles = new HashSet<>();
-            roles.add(Role.ROLE_USER);
-
-            newUser.setRoles(roles);
-
+            newUser.setRoles(new HashSet<>());
             return userRepository.save(newUser);
         });
 
@@ -58,7 +51,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String token = jwtTokenProvider.generateToken(
                 user.getEmail(),
                 user.getId(),
-                user.getRoles().toString()
+                user.getRoles().stream()
+                    .map(Enum::name)
+                    .reduce((a, b) -> a + "," + b)
+                    .orElse("")
         );
 
         // 🔹 Redirect to frontend LOGIN page (not dashboard)

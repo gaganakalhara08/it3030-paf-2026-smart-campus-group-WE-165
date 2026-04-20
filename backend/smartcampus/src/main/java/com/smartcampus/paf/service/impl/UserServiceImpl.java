@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -117,20 +115,12 @@ public class UserServiceImpl implements UserService {
     }
     
     private UserResponseDTO mapToResponse(User user) {
-
-    Set<Role> roles = user.getRoles();
-
-    if (roles == null || roles.isEmpty()) {
-        roles = new HashSet<>();
-        roles.add(Role.ROLE_USER);
+        return new UserResponseDTO(
+            user.getId(),
+            user.getEmail(),
+            user.getName(),
+            user.getPictureUrl(),
+            user.getRoles().stream().map(Enum::name).collect(Collectors.toSet())
+        );
     }
-
-    return new UserResponseDTO(
-        user.getId(),
-        user.getEmail(),
-        user.getName(),
-        user.getPictureUrl(),
-        roles.stream().map(Enum::name).collect(Collectors.toSet())
-    );
-}
 }
