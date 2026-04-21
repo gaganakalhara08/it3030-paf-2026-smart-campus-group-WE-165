@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Calendar, Clock, MapPin, Users, FileText, Edit, Trash2, AlertCircle, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { API_BASE_URL } from "../../../services/api";
+import QRCodeDisplay from "../../../components/booking/QRCodeDisplay";
 
 const BookingDetails = () => {
   const { id } = useParams();
@@ -80,8 +81,8 @@ const BookingDetails = () => {
       const purposeTrimmed = editFormData.purpose.trim();
       const attendeesNum = parseInt(editFormData.expectedAttendees);
 
-      if (purposeTrimmed.length < 10) {
-        toast.error("Purpose must be at least 10 characters");
+      if (purposeTrimmed.length < 5) {
+        toast.error("Purpose must be at least 5 characters");
         setActionLoading(false);
         return;
       }
@@ -111,10 +112,6 @@ const BookingDetails = () => {
         },
         body: JSON.stringify({
           resourceId: booking.resourceId,
-          resourceName: booking.resourceName,
-          resourceType: booking.resourceType,
-          resourceLocation: booking.resourceLocation,
-          capacity: booking.capacity,
           bookingDate: booking.bookingDate,
           startTime: booking.startTime,
           endTime: booking.endTime,
@@ -274,7 +271,7 @@ const BookingDetails = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate("/user/bookings/dashboard")}
@@ -295,160 +292,175 @@ const BookingDetails = () => {
           </div>
         </div>
 
-        <div
-          className={`bg-white rounded-lg shadow-lg overflow-hidden border-2 ${getStatusColor(
-            booking.status
-          )}`}
-        >
-          <div className="p-8 border-b-2 border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              {booking.resourceName}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-start gap-3">
-                <MapPin size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-gray-600">Location</p>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {booking.resourceLocation}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Users size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-gray-600">Capacity</p>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {booking.capacity} people
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-8 border-b-2 border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 mb-6">
-              Booking Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-start gap-3">
-                <Calendar size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-gray-600">Date</p>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {booking.bookingDate}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Clock size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-gray-600">Time</p>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {booking.startTime} - {booking.endTime}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Users size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-gray-600">Expected Attendees</p>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {booking.expectedAttendees} people
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Calendar size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-gray-600">Created On</p>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {new Date(booking.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-8 border-b-2 border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 mb-3">Purpose</h3>
-            <div className="flex gap-3">
-              <FileText size={20} className="text-blue-600 mt-1 flex-shrink-0" />
-              <p className="text-gray-700 leading-relaxed">{booking.purpose}</p>
-            </div>
-          </div>
-
-          {booking.status === "REJECTED" && booking.adminReason && (
-            <div className="p-8 border-b-2 border-red-100 bg-red-50">
-              <h3 className="text-lg font-bold text-red-800 mb-3">
-                Rejection Reason
-              </h3>
-              <div className="flex gap-3">
-                <AlertCircle size={20} className="text-red-600 mt-1 flex-shrink-0" />
-                <p className="text-red-800">{booking.adminReason}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="p-8 border-b-2 border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Booked By</h3>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold text-lg">
-                  {booking.userName.charAt(0)}
-                </span>
-              </div>
-              <div>
-                <p className="text-lg font-semibold text-gray-800">
-                  {booking.userName}
-                </p>
-                <p className="text-gray-600">{booking.userEmail}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-8 bg-gray-50 flex gap-4 flex-wrap">
-            {booking.status === "PENDING" && (
-              <button
-                onClick={openEditModal}
-                className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-              >
-                <Edit size={18} />
-                Edit Booking
-              </button>
-            )}
-
-            {(booking.status === "PENDING" || booking.status === "APPROVED") && (
-              <button
-                onClick={handleCancelBooking}
-                disabled={actionLoading}
-                className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <X size={18} />
-                {actionLoading ? "Cancelling..." : "Cancel Booking"}
-              </button>
-            )}
-
-            {booking.status === "REJECTED" && (
-              <button
-                onClick={handleDeleteBooking}
-                disabled={actionLoading}
-                className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Trash2 size={18} />
-                {actionLoading ? "Deleting..." : "Delete Booking"}
-              </button>
-            )}
-
-            <button
-              onClick={() => navigate("/user/bookings/dashboard")}
-              className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content - Left Side (2 columns) */}
+          <div className="lg:col-span-2 space-y-6">
+            <div
+              className={`bg-white rounded-lg shadow-lg overflow-hidden border-2 ${getStatusColor(
+                booking.status
+              )}`}
             >
-              Back to List
-            </button>
+              <div className="p-8 border-b-2 border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  {booking.resourceName}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-start gap-3">
+                    <MapPin size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-600">Location</p>
+                      <p className="text-lg font-semibold text-gray-800">
+                        {booking.resourceLocation}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Users size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-600">Capacity</p>
+                      <p className="text-lg font-semibold text-gray-800">
+                        {booking.capacity} people
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 border-b-2 border-gray-100">
+                <h3 className="text-lg font-bold text-gray-800 mb-6">
+                  Booking Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-start gap-3">
+                    <Calendar size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-600">Date</p>
+                      <p className="text-lg font-semibold text-gray-800">
+                        {booking.bookingDate}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Clock size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-600">Time</p>
+                      <p className="text-lg font-semibold text-gray-800">
+                        {booking.startTime} - {booking.endTime}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Users size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-600">Expected Attendees</p>
+                      <p className="text-lg font-semibold text-gray-800">
+                        {booking.expectedAttendees} people
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Calendar size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-600">Created On</p>
+                      <p className="text-lg font-semibold text-gray-800">
+                        {new Date(booking.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 border-b-2 border-gray-100">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Purpose</h3>
+                <div className="flex gap-3">
+                  <FileText size={20} className="text-blue-600 mt-1 flex-shrink-0" />
+                  <p className="text-gray-700 leading-relaxed">{booking.purpose}</p>
+                </div>
+              </div>
+
+              {booking.status === "REJECTED" && booking.adminReason && (
+                <div className="p-8 border-b-2 border-red-100 bg-red-50">
+                  <h3 className="text-lg font-bold text-red-800 mb-3">
+                    Rejection Reason
+                  </h3>
+                  <div className="flex gap-3">
+                    <AlertCircle size={20} className="text-red-600 mt-1 flex-shrink-0" />
+                    <p className="text-red-800">{booking.adminReason}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-8 border-b-2 border-gray-100">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">Booked By</h3>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-bold text-lg">
+                      {booking.userName.charAt(0)}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-gray-800">
+                      {booking.userName}
+                    </p>
+                    <p className="text-gray-600">{booking.userEmail}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 bg-gray-50 flex gap-4 flex-wrap">
+                {booking.status === "PENDING" && (
+                  <button
+                    onClick={openEditModal}
+                    className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+                  >
+                    <Edit size={18} />
+                    Edit Booking
+                  </button>
+                )}
+
+                {(booking.status === "PENDING" || booking.status === "APPROVED") && (
+                  <button
+                    onClick={handleCancelBooking}
+                    disabled={actionLoading}
+                    className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <X size={18} />
+                    {actionLoading ? "Cancelling..." : "Cancel Booking"}
+                  </button>
+                )}
+
+                {booking.status === "REJECTED" && (
+                  <button
+                    onClick={handleDeleteBooking}
+                    disabled={actionLoading}
+                    className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 size={18} />
+                    {actionLoading ? "Deleting..." : "Delete Booking"}
+                  </button>
+                )}
+
+                <button
+                  onClick={() => navigate("/user/bookings/dashboard")}
+                  className="flex-1 min-w-[150px] flex items-center justify-center gap-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+                >
+                  Back to List
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* QR Code - Right Side (1 column) */}
+          <div className="lg:col-span-1">
+            {booking && booking.id && (
+              <QRCodeDisplay 
+                bookingId={booking.id} 
+                bookingUrl={`${window.location.origin}/user/bookings/${booking.id}`}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -473,7 +485,7 @@ const BookingDetails = () => {
                   Purpose of Booking{" "}
                   <span className="text-red-500">*</span>
                   <span className="text-xs text-gray-500 font-normal ml-2">
-                    (Minimum 10 characters)
+                    (Minimum 5 characters)
                   </span>
                 </label>
                 <textarea
@@ -482,19 +494,19 @@ const BookingDetails = () => {
                   onChange={handleEditInputChange}
                   placeholder="Describe the purpose of your booking..."
                   rows="4"
-                  minLength="10"
+                  minLength="5"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"
                   required
                 />
                 {editFormData.purpose && (
                   <p
                     className={`text-xs mt-2 ${
-                      editFormData.purpose.length < 10
+                      editFormData.purpose.length < 5
                         ? "text-red-500"
                         : "text-green-600"
                     }`}
                   >
-                    {editFormData.purpose.length}/10 minimum characters
+                    {editFormData.purpose.length}/5 minimum characters
                   </p>
                 )}
               </div>
