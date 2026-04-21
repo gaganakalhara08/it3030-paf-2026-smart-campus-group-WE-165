@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import UserDashboard from "../pages/UserDashboard";
-import UserManagement from "../pages/admin/user/UserManagement";
 import AdminDashboard from "../pages/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import CreateBooking from "../pages/user/booking/CreateBooking";
