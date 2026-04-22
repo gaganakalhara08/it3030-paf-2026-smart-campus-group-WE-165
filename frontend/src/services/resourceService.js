@@ -5,7 +5,7 @@ export const searchResources = async (params = {}) => {
     const queryParams = new URLSearchParams({
       page: params.page || 0,
       size: params.size || 12,
-      status: params.status || "ACTIVE",
+      status: params.status !== undefined ? params.status : "ACTIVE",
       type: params.type || "",
       minCapacity: params.minCapacity || "",
       location: params.location || "",
