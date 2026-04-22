@@ -5,6 +5,24 @@ import { ticketService } from '../services/ticketService';
 import TicketDetailsModal from '../components/TicketDetailsModal';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import { API_BASE_URL } from '../services/api';
+// ✅ Chart imports
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+
+// ✅ Icons
+import {
+  FaTicketAlt,
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaSpinner,
+  FaFire,
+} from 'react-icons/fa';
 
 const TicketAllView = ({ userEmail, userName }) => {
   const navigate = useNavigate();
@@ -132,7 +150,16 @@ const TicketAllView = ({ userEmail, userName }) => {
     });
   };
 
-  // Calculate stats
+  // ✅ Category chart data
+  const categoryData = Object.values(
+    tickets.reduce((acc, t) => {
+      acc[t.category] = acc[t.category] || { name: t.category, count: 0 };
+      acc[t.category].count++;
+      return acc;
+    }, {})
+  );
+
+ // ✅ Stats
   const stats = {
     total: tickets.length,
     open: tickets.filter((t) => t.status === 'OPEN').length,
@@ -174,28 +201,79 @@ const TicketAllView = ({ userEmail, userName }) => {
           </div> */}
         </div>
 
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-            <p className="text-gray-600 text-sm font-medium">Total Tickets</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{stats.total}</p>
-          </div>
-          <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-            <p className="text-blue-700 text-sm font-medium">Open</p>
-            <p className="text-3xl font-bold text-blue-900 mt-1">{stats.open}</p>
-          </div>
-          <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
-            <p className="text-purple-700 text-sm font-medium">In Progress</p>
-            <p className="text-3xl font-bold text-purple-900 mt-1">{stats.inProgress}</p>
-          </div>
-          <div className="bg-green-50 p-6 rounded-lg border border-green-200">
-            <p className="text-green-700 text-sm font-medium">Resolved</p>
-            <p className="text-3xl font-bold text-green-900 mt-1">{stats.resolved}</p>
-          </div>
-          <div className="bg-red-50 p-6 rounded-lg border border-red-200">
-            <p className="text-red-700 text-sm font-medium">Urgent</p>
-            <p className="text-3xl font-bold text-red-900 mt-1">{stats.urgent}</p>
-          </div>
+        {/* ✅ STAT CARDS WITH ICONS */}
+        <div className="grid md:grid-cols-5 gap-4 mb-6">
+
+  {/* TOTAL */}
+  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl shadow-sm">
+    <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xl">
+      <FaTicketAlt />
+    </div>
+    <div>
+      <p className="text-gray-500 text-sm">Total Tickets</p>
+      <h2 className="text-2xl font-bold text-gray-900">{stats.total}</h2>
+    </div>
+    
+  </div>
+
+  {/* OPEN */}
+  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl shadow-sm">
+    <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xl">
+      <FaExclamationCircle />
+    </div>
+    <div>
+      <p className="text-gray-500 text-sm">Open</p>
+      <h2 className="text-2xl font-bold text-gray-900">{stats.open}</h2>
+    </div>  
+  </div>
+
+  {/* IN PROGRESS */}
+  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl shadow-sm">
+    <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xl">
+      <FaSpinner />
+    </div>
+    <div>
+      <p className="text-gray-500 text-sm">In Progress</p>
+      <h2 className="text-2xl font-bold text-gray-900">{stats.inProgress}</h2>
+    </div>
+  </div>
+
+  {/* RESOLVED */}
+  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl shadow-sm">
+    <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xl">
+      <FaCheckCircle />
+    </div>
+    <div>
+      <p className="text-gray-500 text-sm">Resolved</p>
+      <h2 className="text-2xl font-bold text-gray-900">{stats.resolved}</h2>
+    </div>
+  </div>
+
+  {/* URGENT */}
+  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl shadow-sm">
+    <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white text-xl">
+      <FaFire />
+    </div>
+    <div>
+      <p className="text-gray-500 text-sm">Urgent</p>
+      <h2 className="text-2xl font-bold text-gray-900">{stats.urgent}</h2>
+    </div>
+  </div>
+
+</div>
+
+        {/* ✅ CATEGORY CHART */}
+        <div className="bg-white p-5 rounded-lg shadow mb-6">
+          <h2 className="text-lg font-semibold mb-4">Tickets by Category</h2>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={categoryData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#7C3AED" /> {/* PURPLE */}
+            </BarChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Error Message */}
