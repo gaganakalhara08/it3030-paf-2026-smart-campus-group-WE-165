@@ -3,10 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CheckCircle, Clock, MapPin, Users, Download } from "lucide-react";
 import toast from "react-hot-toast";
 
-const API_BASE_URL =
-  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "http://localhost:8080/api"
-    : `http://${window.location.hostname}:8080/api`;
+const isLocalHost =
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+const API_BASE_URL = isLocalHost
+  ? "http://localhost:8080/api"
+  : "http://" + window.location.hostname + ":8080/api";
+
+// Set this in frontend/.env for mobile QR scan:
+// VITE_APP_BASE_URL=http://192.168.1.25:5173
+const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL || window.location.origin).replace(/\/$/, "");
 
 const BookingCheckIn = () => {
   const { id } = useParams();
@@ -30,11 +36,11 @@ const BookingCheckIn = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+      const response = await fetch(API_BASE_URL + "/bookings/" + id, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: "Bearer " + token,
         },
       });
 
@@ -58,8 +64,8 @@ const BookingCheckIn = () => {
     const canvas = canvasRef.current;
 
     if (canvas) {
-      // Encode a URL (not JSON text) so phone scanners open it directly.
-      const qrData = `${window.location.origin}/user/bookings/check-in/${bookingData.id}`;
+      // Must match the React Router route: /user/bookings/:id/check-in
+      const qrData = APP_BASE_URL + "/user/bookings/" + bookingData.id + "/check-in";
 
       try {
         await QRCode.toCanvas(canvas, qrData, {
@@ -80,11 +86,11 @@ const BookingCheckIn = () => {
   const handleCheckIn = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/bookings/${id}/check-in`, {
+      const response = await fetch(API_BASE_URL + "/bookings/" + id + "/check-in", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: "Bearer " + token,
         },
       });
 
@@ -103,7 +109,7 @@ const BookingCheckIn = () => {
   const downloadQR = () => {
     if (canvasRef.current) {
       const link = document.createElement("a");
-      link.download = `booking-${id}-qr.png`;
+      link.download = "booking-" + id + "-qr.png";
       link.href = canvasRef.current.toDataURL();
       link.click();
       toast.success("QR code downloaded!");

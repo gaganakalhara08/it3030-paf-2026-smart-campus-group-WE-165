@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Calendar, Users, MapPin, Send, Clock, Loader } from "lucide-react";
 import toast from "react-hot-toast";
 import { API_BASE_URL, getAuthHeaders } from "../../../services/api";
 
 const CreateBooking = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const preselectedResourceId = location.state?.resourceId;
   const [formData, setFormData] = useState({
     resourceId: "",
     bookingDate: "",
@@ -47,7 +49,23 @@ const CreateBooking = () => {
         }
 
         const data = await response.json();
-        setResources(data.content || []);
+        const fetchedResources = data.content || [];
+        setResources(fetchedResources);
+
+        // Auto-select resource when arriving from catalogue "Book Now"
+        if (preselectedResourceId) {
+          const matchedResource = fetchedResources.find(
+            (r) => String(r.id) === String(preselectedResourceId)
+          );
+
+          if (matchedResource) {
+            setFormData((prev) => ({
+              ...prev,
+              resourceId: String(matchedResource.id),
+            }));
+            setSelectedResource(matchedResource);
+          }
+        }
       } catch (error) {
         console.error("Error fetching resources:", error);
         toast.error("Failed to load resources");
@@ -57,11 +75,11 @@ const CreateBooking = () => {
     };
 
     fetchResources();
-  }, [navigate]);
+  }, [navigate, preselectedResourceId]);
 
   const handleResourceChange = (e) => {
     const resourceId = e.target.value;
-    const resource = resources.find((r) => r.id === resourceId);
+    const resource = resources.find((r) => String(r.id) === String(resourceId));
     if (resource) {
       setFormData({
         ...formData,
