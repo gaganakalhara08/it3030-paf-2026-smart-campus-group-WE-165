@@ -228,12 +228,12 @@ const CreateBooking = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_#0f766e_0%,_#1e293b_45%,_#334155_100%)] p-6">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <button
           onClick={() => navigate("/user/bookings/dashboard")}
-          className="flex items-center gap-2 text-purple-300 hover:text-purple-100 mb-8 transition-colors"
+          className="mb-8 inline-flex items-center gap-2 rounded-xl border border-cyan-700/70 bg-slate-800/55 px-4 py-2 text-slate-100 backdrop-blur transition hover:border-cyan-300 hover:text-cyan-100"
         >
           <ArrowLeft size={20} />
           <span>Back to Dashboard</span>
@@ -241,19 +241,21 @@ const CreateBooking = () => {
 
         {/* Title */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Create Booking</h1>
-          <p className="text-gray-300">Reserve a resource for your needs</p>
+          <p className="mb-2 text-4xl font-extrabold tracking-tight text-slate-50 sm:text-5xl">Create Booking</p>
+          <p className="max-w-2xl text-slate-200">
+            Reserve your campus resource with live availability checks and a cleaner booking experience.
+          </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Resource Selection */}
-          <div className="bg-slate-800 border border-purple-500 border-opacity-30 rounded-xl p-6 hover:border-opacity-60 transition-all">
-            <label className="block text-sm font-semibold text-gray-300 mb-3">
+          <div className="rounded-3xl border border-cyan-800/50 bg-slate-800/65 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur">
+            <label className="mb-3 block text-sm font-semibold uppercase tracking-wide text-cyan-200">
               Select Resource <span className="text-red-400">*</span>
             </label>
             {resourcesLoading ? (
-              <div className="flex items-center justify-center py-8 text-gray-400">
+              <div className="flex items-center justify-center py-8 text-slate-400">
                 <Loader size={20} className="animate-spin mr-2" />
                 Loading resources...
               </div>
@@ -261,7 +263,7 @@ const CreateBooking = () => {
               <select
                 value={formData.resourceId}
                 onChange={handleResourceChange}
-                className="w-full px-4 py-3 bg-slate-700 border border-purple-400 border-opacity-40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:border-opacity-100 transition-all"
+                className="w-full rounded-2xl border border-slate-500 bg-slate-700/85 px-4 py-3 text-slate-100 transition-all focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/25"
                 required
               >
                 <option value="">Choose a resource...</option>
@@ -276,19 +278,19 @@ const CreateBooking = () => {
 
           {/* Resource Details */}
           {selectedResource && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gradient-to-br from-purple-900 to-slate-800 border border-purple-500 border-opacity-30 rounded-xl">
-              <div className="flex items-center gap-3 text-gray-200">
-                <MapPin size={18} className="text-purple-400" />
+            <div className="grid grid-cols-1 gap-4 rounded-3xl border border-cyan-500/30 bg-cyan-700/20 p-5 backdrop-blur md:grid-cols-2">
+              <div className="flex items-center gap-3 text-slate-200">
+                <MapPin size={18} className="text-cyan-300" />
                 <div>
-                  <p className="text-xs text-gray-400">Location</p>
-                  <p className="font-semibold">{selectedResource.location}</p>
+                  <p className="text-xs uppercase tracking-wide text-cyan-200/80">Location</p>
+                  <p className="font-semibold text-white">{selectedResource.location}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-gray-200">
-                <Users size={18} className="text-purple-400" />
+              <div className="flex items-center gap-3 text-slate-200">
+                <Users size={18} className="text-cyan-300" />
                 <div>
-                  <p className="text-xs text-gray-400">Capacity</p>
-                  <p className="font-semibold">{selectedResource.capacity} people</p>
+                  <p className="text-xs uppercase tracking-wide text-cyan-200/80">Capacity</p>
+                  <p className="font-semibold text-white">{selectedResource.capacity} people</p>
                 </div>
               </div>
             </div>
@@ -296,14 +298,14 @@ const CreateBooking = () => {
 
           {/* Calendar view for booked slots (per day) */}
           {selectedResource && (
-            <div className="bg-slate-800 border border-purple-500 border-opacity-30 rounded-xl p-6 hover:border-opacity-60 transition-all">
+            <div className="rounded-3xl border border-cyan-800/50 bg-slate-800/65 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur">
               <ResourceAvailabilityCalendar resource={selectedResource} />
             </div>
           )}
 
           {/* Date Selection */}
-          <div className="bg-slate-800 border border-purple-500 border-opacity-30 rounded-xl p-6 hover:border-opacity-60 transition-all">
-            <label className="block text-sm font-semibold text-gray-300 mb-3">
+          <div className="rounded-3xl border border-cyan-800/50 bg-slate-800/65 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur">
+            <label className="mb-3 block text-sm font-semibold uppercase tracking-wide text-cyan-200">
               Booking Date <span className="text-red-400">*</span>
             </label>
             <div className="relative">
@@ -313,27 +315,27 @@ const CreateBooking = () => {
                 value={formData.bookingDate}
                 onChange={handleInputChange}
                 min={new Date().toISOString().split("T")[0]}
-                className="w-full px-4 py-3 bg-slate-700 border border-purple-400 border-opacity-40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:border-opacity-100 transition-all"
+                className="w-full rounded-2xl border border-slate-500 bg-slate-700/85 px-4 py-3 text-slate-100 transition-all focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/25"
                 required
               />
               <Calendar
                 size={20}
-                className="absolute right-3 top-3 text-purple-400 pointer-events-none"
+                className="pointer-events-none absolute right-3 top-3 text-cyan-300"
               />
             </div>
           </div>
 
           {/* Time Selection */}
           {formData.bookingDate && formData.resourceId && (
-            <div className="bg-slate-800 border border-purple-500 border-opacity-30 rounded-xl p-6 hover:border-opacity-60 transition-all">
-              <label className="block text-sm font-semibold text-gray-300 mb-4">
+            <div className="rounded-3xl border border-cyan-800/50 bg-slate-800/65 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur">
+              <label className="mb-4 block text-sm font-semibold uppercase tracking-wide text-cyan-200">
                 Select Time Slot <span className="text-red-400">*</span>
               </label>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 {/* Start Time */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 mb-2">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-400">
                     Start Time
                   </label>
                   <div className="relative">
@@ -342,19 +344,19 @@ const CreateBooking = () => {
                       name="startTime"
                       value={formData.startTime}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-slate-700 border border-purple-400 border-opacity-40 rounded-lg text-white focus:outline-none focus:border-purple-400 focus:border-opacity-100 transition-all"
+                      className="w-full rounded-2xl border border-slate-500 bg-slate-700/85 px-4 py-3 text-slate-100 transition-all focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/25"
                       required
                     />
                     <Clock
                       size={18}
-                      className="absolute right-3 top-3 text-purple-400 pointer-events-none"
+                      className="pointer-events-none absolute right-3 top-3 text-cyan-300"
                     />
                   </div>
                 </div>
 
                 {/* End Time */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 mb-2">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-400">
                     End Time
                   </label>
                   <div className="relative">
@@ -363,12 +365,12 @@ const CreateBooking = () => {
                       name="endTime"
                       value={formData.endTime}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-slate-700 border border-purple-400 border-opacity-40 rounded-lg text-white focus:outline-none focus:border-purple-400 focus:border-opacity-100 transition-all"
+                      className="w-full rounded-2xl border border-slate-500 bg-slate-700/85 px-4 py-3 text-slate-100 transition-all focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/25"
                       required
                     />
                     <Clock
                       size={18}
-                      className="absolute right-3 top-3 text-purple-400 pointer-events-none"
+                      className="pointer-events-none absolute right-3 top-3 text-cyan-300"
                     />
                   </div>
                 </div>
@@ -383,7 +385,7 @@ const CreateBooking = () => {
                   !formData.startTime ||
                   !formData.endTime
                 }
-                className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-sky-600 px-4 py-2.5 font-semibold text-white transition-all hover:from-cyan-400 hover:to-sky-500 disabled:cursor-not-allowed disabled:from-slate-500 disabled:to-slate-500"
               >
                 {checkingAvailability ? (
                   <>
@@ -400,8 +402,8 @@ const CreateBooking = () => {
                 <div
                   className={`mt-3 p-3 rounded-lg text-sm font-semibold ${
                     isAvailable
-                      ? "bg-green-900 bg-opacity-30 border border-green-500 text-green-300"
-                      : "bg-red-900 bg-opacity-30 border border-red-500 text-red-300"
+                      ? "border border-emerald-500/40 bg-emerald-500/15 text-emerald-200"
+                      : "border border-rose-500/40 bg-rose-500/15 text-rose-200"
                   }`}
                 >
                   {availabilityMessage}
@@ -411,10 +413,10 @@ const CreateBooking = () => {
           )}
 
           {/* Purpose */}
-          <div className="bg-slate-800 border border-purple-500 border-opacity-30 rounded-xl p-6 hover:border-opacity-60 transition-all">
-            <label className="block text-sm font-semibold text-gray-300 mb-3">
+          <div className="rounded-3xl border border-cyan-800/50 bg-slate-800/65 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur">
+            <label className="mb-3 block text-sm font-semibold uppercase tracking-wide text-cyan-200">
               Purpose of Booking <span className="text-red-400">*</span>
-              <span className="text-xs text-gray-400 font-normal ml-2">
+              <span className="ml-2 text-xs font-normal tracking-normal text-slate-400">
                 (Minimum 5 characters)
               </span>
             </label>
@@ -425,13 +427,13 @@ const CreateBooking = () => {
               placeholder="Describe the purpose of your booking..."
               rows="4"
               minLength="5"
-              className="w-full px-4 py-3 bg-slate-700 border border-purple-400 border-opacity-40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:border-opacity-100 transition-all resize-none"
+              className="w-full resize-none rounded-2xl border border-slate-500 bg-slate-700/85 px-4 py-3 text-slate-100 transition-all focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/25"
               required
             />
             {formData.purpose && (
               <p
                 className={`text-xs mt-2 ${
-                  formData.purpose.length < 5 ? "text-red-400" : "text-green-400"
+                  formData.purpose.length < 5 ? "text-rose-500" : "text-emerald-600"
                 }`}
               >
                 {formData.purpose.length}/5 minimum characters
@@ -440,8 +442,8 @@ const CreateBooking = () => {
           </div>
 
           {/* Expected Attendees */}
-          <div className="bg-slate-800 border border-purple-500 border-opacity-30 rounded-xl p-6 hover:border-opacity-60 transition-all">
-            <label className="block text-sm font-semibold text-gray-300 mb-3">
+          <div className="rounded-3xl border border-cyan-800/50 bg-slate-800/65 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur">
+            <label className="mb-3 block text-sm font-semibold uppercase tracking-wide text-cyan-200">
               Expected Attendees <span className="text-red-400">*</span>
             </label>
             <div className="relative">
@@ -453,16 +455,16 @@ const CreateBooking = () => {
                 min="1"
                 max={selectedResource?.capacity || 100}
                 placeholder="Number of people"
-                className="w-full px-4 py-3 bg-slate-700 border border-purple-400 border-opacity-40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:border-opacity-100 transition-all"
+                className="w-full rounded-2xl border border-slate-500 bg-slate-700/85 px-4 py-3 text-slate-100 transition-all focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/25"
                 required
               />
               <Users
                 size={20}
-                className="absolute right-3 top-3 text-purple-400 pointer-events-none"
+                className="pointer-events-none absolute right-3 top-3 text-cyan-300"
               />
             </div>
             {selectedResource && formData.expectedAttendees && (
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="mt-2 text-xs text-slate-400">
                 {formData.expectedAttendees} / {selectedResource.capacity} capacity
               </p>
             )}
@@ -473,14 +475,14 @@ const CreateBooking = () => {
             <button
               type="button"
               onClick={() => navigate("/user/bookings/dashboard")}
-              className="flex-1 px-6 py-3 border-2 border-gray-600 text-gray-300 hover:text-white hover:border-gray-400 rounded-lg font-semibold transition-all"
+              className="flex-1 rounded-2xl border border-slate-500 bg-slate-700/70 px-6 py-3 font-semibold text-slate-100 transition-all hover:border-cyan-300 hover:text-cyan-100"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !isAvailable}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-sky-600 px-6 py-3 font-semibold text-white transition-all hover:from-cyan-400 hover:to-sky-500 disabled:cursor-not-allowed disabled:from-slate-500 disabled:to-slate-500"
             >
               {loading ? (
                 <>
