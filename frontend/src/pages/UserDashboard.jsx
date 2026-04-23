@@ -1,49 +1,77 @@
 import React from "react";
+import Sidebar from "../components/Sidebar";
 import UserHeader from "../components/user/UserHeader";
 
 const UserDashboard = () => {
-  // Get user info from localStorage (set during login)
-  const userEmail = localStorage.getItem('userEmail');
-  const userName = localStorage.getItem('userName');
+  const userName = localStorage.getItem("userName");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header Component */}
-      <UserHeader />
+    <div className="flex min-h-screen bg-gray-50">
 
-      {/* Welcome Section - Your Part */}
-      <div className="p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-20">
-            <h2 className="text-5xl font-bold text-gray-800 mb-4">Welcome to Smart Campus Portal</h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Manage your campus bookings efficiently. Click on "Booking Dashboard" in the header to view and manage your bookings.
-            </p>
-            
-            <div className="mt-12">
-              <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto">
-                <h3 className="text-3xl font-bold text-gray-800 mb-4">Ready to get started?</h3>
-                <p className="text-gray-600 mb-6">
-                  Use the buttons in the header above to navigate through the booking system.
-                </p>
-                <ul className="text-left space-y-3 text-gray-700 mb-8">
-                  <li className="flex items-center gap-3">
-                    <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">1</span>
-                    <span>Click "Booking Dashboard" to view all your bookings</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">2</span>
-                    <span>Click "Create Booking" to make a new booking</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">3</span>
-                    <span>Manage your bookings and track their status</span>
-                  </li>
-                </ul>
-              </div>
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Main */}
+      <div className="flex-1 flex flex-col ml-64">
+
+        {/* Header */}
+        <UserHeader />
+
+        {/* Content */}
+        <div className="flex-1 px-6 py-10">
+          <div className="max-w-5xl mx-auto">
+
+            {/* Welcome */}
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-800 mb-3">
+                Welcome, {userName || "User"} 👋
+              </h2>
+              <p className="text-gray-600">
+                Manage your campus bookings easily from here.
+              </p>
             </div>
+
+            {/* Main Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                Getting Started
+              </h3>
+
+              <p className="text-gray-600 mb-6">
+                Use the sidebar to navigate through the system.
+              </p>
+
+              <div className="space-y-4">
+
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold">
+                    1
+                  </span>
+                  <p>View your bookings</p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold">
+                    2
+                  </span>
+                  <p>Create a new booking</p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold">
+                    3
+                  </span>
+                  <p>Track your requests and tickets</p>
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
         </div>
+
       </div>
     </div>
   );

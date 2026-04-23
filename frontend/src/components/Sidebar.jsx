@@ -1,53 +1,45 @@
-import { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Bell } from "lucide-react";
+import headerBg from "../../assets/Green.png"; // 👈 background image
 
-function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+const UserHeader = () => {
   const navigate = useNavigate();
 
-  const menuItems = [
-    { label: "Dashboard", path: "/dashboard", icon: "📊" },
-    { label: "My Tickets", path: "/user-dashboard", icon: "🎫" },
-    { label: "Profile", path: "#", icon: "👤" },
-    { label: "Settings", path: "#", icon: "⚙️" },
-  ];
+  const userName = localStorage.getItem("userName") || "User";
 
   return (
-    <div className="flex">
-      <div
-        className={`${
-          isOpen ? "w-64" : "w-20"
-        } bg-gray-800 text-white transition-all duration-300 min-h-screen`}
-      >
-        <div className="p-4 flex justify-between items-center">
-          {isOpen && <h2 className="text-xl font-bold">Menu</h2>}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="text-white hover:bg-gray-700 p-2 rounded"
-          >
-            {isOpen ? "◀" : "▶"}
+    <div
+      className="relative shadow-md"
+      style={{
+        backgroundImage: `url(${headerBg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* 🔥 Overlay for readability */}
+      <div className="absolute inset-0 bg-green-900/60 backdrop-blur-[1px]" />
+
+      {/* 🔥 CONTENT */}
+      <div className="relative flex justify-between items-center px-6 py-4">
+
+        {/* RIGHT — USER */}
+        <div className="flex items-center gap-6">
+
+          {/* Notification */}
+          <button className="text-white hover:text-green-200 transition">
+            <Bell size={20} />
           </button>
+
+          {/* User */}
+          <p className="text-white font-medium">
+            {userName}
+          </p>
+
         </div>
-
-        <nav className="mt-8">
-          {menuItems.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                if (item.path !== "#") navigate(item.path);
-              }}
-              className="w-full flex items-center gap-4 px-4 py-3 hover:bg-gray-700 transition mb-2"
-            >
-              <span className="text-2xl">{item.icon}</span>
-              {isOpen && <span>{item.label}</span>}
-            </button>
-          ))}
-        </nav>
       </div>
-
-      <div className="flex-1 bg-gray-100 min-h-screen" />
     </div>
   );
-}
+};
 
-export default Sidebar;
+export default UserHeader;

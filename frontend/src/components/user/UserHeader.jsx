@@ -1,68 +1,40 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, LayoutDashboard, Plus, Home, Building2 } from "lucide-react";
+import { Bell } from "lucide-react";
+import headerBg from "../../assets/Green.jpg";
 
 const UserHeader = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  const userName = localStorage.getItem("userName") || "User";
 
   return (
-    <div className="bg-white shadow">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">Smart Campus Portal</h1>
-          <p className="text-gray-600 text-sm mt-1">Manage all your campus resources and requests</p>
-        </div>
-        <div className="flex gap-3 items-center flex-wrap">
-          <button
-            onClick={() => navigate("/user/dashboard")}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
-          >
-            <Home size={16} />
-            Dashboard
-          </button>
-          {/* Module A — Resource Catalogue */}
-          <button
-            onClick={() => navigate("/user/resources")}
-            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
-          >
-            <Building2 size={16} />
-            Browse Resources
+    <div
+      className="relative shadow-md"
+      style={{
+        backgroundImage: `url(${headerBg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* 🔥 Overlay (lighter + cleaner) */}
+      <div className="absolute inset-0" />
+
+      {/* 🔥 CONTENT */}
+      <div className="relative flex justify-end items-center px-6 h-30">
+
+        <div className="flex items-center gap-6">
+
+          {/* 🔔 Notification */}
+          <button className="text-black hover:text-green-200 transition">
+            <Bell size={22} />
           </button>
 
-          <button
-            onClick={() => navigate("/user/dashboard/tickets")}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
-          >
-            <LayoutDashboard size={16} />
-            Tickets Dashboard
-          </button>
+          {/* 👤 User */}
+          <p className="text-black font-semibold text-lg drop-shadow-sm">
+            {userName}
+          </p>
 
-          <button
-            onClick={() => navigate("/user/bookings/dashboard")}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
-          >
-            <LayoutDashboard size={16} />
-            My Bookings
-          </button>
-          <button
-            onClick={() => navigate("/user/bookings/create")}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
-          >
-            <Plus size={16} />
-            Create Booking
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
         </div>
       </div>
     </div>
