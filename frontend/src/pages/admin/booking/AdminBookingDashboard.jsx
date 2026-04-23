@@ -200,7 +200,7 @@ const AdminBookingDashboard = () => {
       <AdminSidebar onLogout={handleLogout} />
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto w-full relative">
+      <div className="flex-1 overflow-y-auto w-full relative ml-64">
         {/* Background abstract decoration */}
         <div className="absolute top-0 right-0 w-full h-96 bg-gradient-to-br from-indigo-50/50 via-slate-50 to-transparent -z-10 blur-3xl pointer-events-none"></div>
 

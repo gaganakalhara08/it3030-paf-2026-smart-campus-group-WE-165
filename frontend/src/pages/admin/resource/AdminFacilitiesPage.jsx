@@ -157,7 +157,7 @@ const AdminFacilitiesPage = () => {
     <div className="flex min-h-screen bg-slate-50">
       <AdminSidebar onLogout={handleLogout} />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 ml-64">
         {/* Page Header */}
         <div className="bg-white border-b border-slate-200 px-8 py-5 flex items-center justify-between">
           <div>

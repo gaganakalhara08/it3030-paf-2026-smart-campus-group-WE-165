@@ -188,7 +188,7 @@ const TicketAllView = ({ userEmail, userName }) => {
   return (
     <div className="flex min-h-screen bg-white">
       <AdminSidebar onLogout={handleLogout} />
-      <div className="flex-1 p-6 overflow-y-auto bg-white">
+      <div className="flex-1 ml-64 p-6 overflow-y-auto bg-white">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>

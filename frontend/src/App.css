@@ -230,3 +230,8 @@ html, body, #root {
   cursor: pointer;
   font-weight: 500;
 }
+
+html, body, #root {
+  height: 100%;
+  background-color: #f9fafb; /* Tailwind gray-50 */
+}

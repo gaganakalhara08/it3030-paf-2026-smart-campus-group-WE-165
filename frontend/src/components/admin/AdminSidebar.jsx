@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Calendar,
-  Bell,
   Ticket,
   Users,
   Building2,
@@ -10,7 +9,7 @@ import {
   ChevronRight,
   BarChart2,
 } from "lucide-react";
-import logo from "../../assets/logo.png"; // adjust path if needed
+import logo from "../../assets/logo.png";
 
 const AdminSidebar = ({ onLogout }) => {
   const navigate = useNavigate();
@@ -57,24 +56,30 @@ const AdminSidebar = ({ onLogout }) => {
   const isActive = (path) => location.pathname.startsWith(path);
 
   return (
-    <div className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-50">
+    <div className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-md z-50">
       
-      {/* 🔝 Logo Section (Clickable → Dashboard) */}
+      {/* 🔝 Logo */}
       <div
-        onClick={() => navigate("/dashboard")}
-        className="px-6 py-5 border-b border-gray-100 flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition"
-      >
-        <img src={logo} alt="logo" className="h-8 w-8 object-contain" />
-        <div>
-          <h2 className="text-lg font-semibold text-gray-800">
-            Campus Ops
-          </h2>
-          <p className="text-xs text-gray-400">Admin Portal</p>
-        </div>
-      </div>
+      onClick={() => navigate("/dashboard")}
+      className="px-6 py-6 border-b border-gray-100 flex flex-col items-center text-center cursor-pointer hover:bg-gray-50 transition"
+    >
+      <img
+        src={logo}
+        alt="logo"
+        className="h-15 w-30 object-contain mb-2"
+      />
 
-      {/* 📚 Navigation */}
-      <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+      <h2 className="text-lg font-semibold text-gray-900">
+        Campus Ops
+      </h2>
+
+      <p className="text-xs text-gray-400">
+        Admin Portal
+      </p>
+    </div>
+
+      {/* 📚 NAVIGATION */}
+      <nav className="flex-1 flex flex-col justify-center px-3 py-6 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
@@ -83,10 +88,10 @@ const AdminSidebar = ({ onLogout }) => {
             <button
               key={item.id}
               onClick={() => navigate(item.path)}
-              className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 active
-                  ? "bg-green-50 text-green-700"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                  ? "bg-green-50 text-green-700 border-l-4 border-green-600 shadow-sm"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:translate-x-1"
               }`}
             >
               <Icon
@@ -97,7 +102,9 @@ const AdminSidebar = ({ onLogout }) => {
               />
 
               <div className="flex-1 text-left">
-                <p className="text-sm font-medium">{item.label}</p>
+                <p className={`text-sm ${active ? "font-semibold" : ""}`}>
+                  {item.label}
+                </p>
                 <p className="text-xs text-gray-400">
                   {item.description}
                 </p>
@@ -115,7 +122,7 @@ const AdminSidebar = ({ onLogout }) => {
       <div className="px-3 py-5 border-t border-gray-100">
         <button
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-all"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-all hover:translate-x-1"
         >
           <LogOut size={20} />
           <span className="text-sm font-medium">Logout</span>
