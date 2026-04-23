@@ -1,45 +1,90 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Bell } from "lucide-react";
-import headerBg from "../../assets/Green.png"; // 👈 background image
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Home,
+  Building2,
+  LayoutDashboard,
+  Calendar,
+  Plus,
+  LogOut,
+} from "lucide-react";
 
-const UserHeader = () => {
+const Sidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const userName = localStorage.getItem("userName") || "User";
+  const menuItems = [
+    {
+      label: "Browse Resources",
+      icon: Building2,
+      path: "/user/resources",
+    },
+    {
+      label: "Tickets",
+      icon: LayoutDashboard,
+      path: "/user/dashboard/tickets",
+    },
+    {
+      label: "My Bookings",
+      icon: Calendar,
+      path: "/user/bookings/dashboard",
+    }
+  ];
+
+  const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
-    <div
-      className="relative shadow-md"
-      style={{
-        backgroundImage: `url(${headerBg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      {/* 🔥 Overlay for readability */}
-      <div className="absolute inset-0 bg-green-900/60 backdrop-blur-[1px]" />
+    <div className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col z-50">
 
-      {/* 🔥 CONTENT */}
-      <div className="relative flex justify-between items-center px-6 py-4">
+      {/* 🔥 LOGO (CLICKABLE → DASHBOARD) */}
+      <div
+        onClick={() => navigate("/user/dashboard")}
+        className="py-6 text-center border-b cursor-pointer hover:bg-green-50 transition"
+      >
+        <h1 className="text-xl font-bold text-gray-800">Campus Ops</h1>
+        <p className="text-xs text-gray-500">User Portal</p>
+      </div>
 
-        {/* RIGHT — USER */}
-        <div className="flex items-center gap-6">
+      {/* Menu */}
+      <div className="flex-1 flex flex-col justify-center px-4 space-y-2">
+        {menuItems.map((item, index) => {
+          const Icon = item.icon;
+          const active = isActive(item.path);
 
-          {/* Notification */}
-          <button className="text-white hover:text-green-200 transition">
-            <Bell size={20} />
-          </button>
+          return (
+            <button
+              key={index}
+              onClick={() => navigate(item.path)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                active
+                  ? "bg-green-100 text-green-700 font-semibold"
+                  : "text-gray-600 hover:bg-green-50 hover:text-green-600"
+              }`}
+            >
+              <Icon size={18} />
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
 
-          {/* User */}
-          <p className="text-white font-medium">
-            {userName}
-          </p>
-
-        </div>
+      {/* Logout */}
+      <div className="p-4 border-t">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg w-full"
+        >
+          <LogOut size={18} />
+          Logout
+        </button>
       </div>
     </div>
   );
 };
 
-export default UserHeader;
+export default Sidebar;
