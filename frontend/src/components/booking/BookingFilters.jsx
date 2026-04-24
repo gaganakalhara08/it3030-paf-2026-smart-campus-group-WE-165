@@ -3,7 +3,7 @@ import { Filter } from "lucide-react";
 
 const BookingFilters = ({ statusFilter, onStatusChange }) => {
   return (
-    <div className="bg-white rounded-lg shadow p-4 flex flex-wrap items-center gap-4">
+    <div className="flex flex-wrap items-center gap-4">
       <div className="flex items-center gap-2">
         <Filter size={20} className="text-gray-600" />
         <span className="font-semibold text-gray-700">Filter by Status:</span>
@@ -14,8 +14,8 @@ const BookingFilters = ({ statusFilter, onStatusChange }) => {
           onClick={() => onStatusChange("")}
           className={`px-4 py-2 rounded-lg font-semibold transition-all ${
             statusFilter === ""
-              ? "bg-blue-600 text-white shadow-md"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              ? "bg-emerald-600 text-white"
+              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
           }`}
         >
           All

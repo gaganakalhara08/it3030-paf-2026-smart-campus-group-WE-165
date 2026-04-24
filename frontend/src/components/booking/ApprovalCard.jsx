@@ -24,9 +24,9 @@ const ApprovalCard = ({ booking, onApprove, onReject }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all overflow-hidden border-l-4 border-yellow-500">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 border-l-4 border-l-amber-500 bg-white shadow-sm transition-colors hover:border-emerald-200">
       {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-b border-yellow-100">
+      <div className="border-b border-amber-100 bg-amber-50 p-4">
         <div className="flex justify-between items-start mb-2">
           <div>
             <h3 className="text-lg font-bold text-gray-800">
@@ -41,7 +41,7 @@ const ApprovalCard = ({ booking, onApprove, onReject }) => {
       {/* Content */}
       <div className="p-4 space-y-3">
         {/* User Info */}
-        <div className="bg-blue-50 rounded p-3">
+        <div className="rounded-xl bg-sky-50 p-3">
           <p className="text-xs text-gray-600 font-semibold mb-1">Requested By</p>
           <p className="font-semibold text-gray-800">{booking.userName}</p>
           <p className="text-xs text-gray-600">{booking.userEmail}</p>
@@ -126,7 +126,7 @@ const ApprovalCard = ({ booking, onApprove, onReject }) => {
                 onApprove();
               }}
               disabled={isLoading}
-              className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 py-2 font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <CheckCircle size={18} />
               {isLoading ? "Processing..." : "Approve"}
