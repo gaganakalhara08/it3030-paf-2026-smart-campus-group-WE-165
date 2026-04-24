@@ -1,18 +1,19 @@
 import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Building2,
-  LayoutDashboard,
-  Calendar,
-  LogOut,
-  ChevronRight,
-} from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Building2, Calendar, ChevronRight, Home, LifeBuoy, LogOut } from "lucide-react";
+import logo from "../assets/logo.png";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const menuItems = [
+    {
+      label: "Overview",
+      description: "Your campus home",
+      icon: Home,
+      path: "/user/dashboard",
+    },
     {
       label: "Browse Resources",
       description: "Explore available facilities",
@@ -22,7 +23,7 @@ const Sidebar = () => {
     {
       label: "Tickets",
       description: "Track support requests",
-      icon: LayoutDashboard,
+      icon: LifeBuoy,
       path: "/user/dashboard/tickets",
     },
     {
@@ -33,7 +34,7 @@ const Sidebar = () => {
     },
   ];
 
-  const isActive = (path) => location.pathname.startsWith(path);
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -41,78 +42,57 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-50">
-
-      {/* 🔝 LOGO SECTION */}
-      <div
+    <aside className="fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-slate-200 bg-white shadow-sm">
+      <button
+        type="button"
         onClick={() => navigate("/user/dashboard")}
-        className="px-6 py-6 text-center cursor-pointer hover:bg-green-50 transition border-b border-gray-100"
+        className="flex flex-col items-center border-b border-slate-100 px-6 py-6 text-center transition hover:bg-slate-50"
       >
-        {/* LOGO TEXT */}
-        <h1 className="text-sm font-bold tracking-wide text-gray-700 mb-2">
-          CAMPUS OPS
-        </h1>
+        <img src={logo} alt="Campus Ops" className="mb-2 h-14 w-32 object-contain" />
+        <span className="text-lg font-semibold text-slate-900">Campus Ops</span>
+        <span className="text-xs text-slate-400">Student Portal</span>
+      </button>
 
-        {/* NAME */}
-        <h2 className="text-lg font-semibold text-gray-800">
-          Campus Ops
-        </h2>
-
-        {/* SUBTEXT */}
-        <p className="text-xs text-gray-400 mt-1">
-          Student Portal
-        </p>
-      </div>
-
-      {/* 📚 MENU */}
-      <nav className="flex-1 flex flex-col justify-center px-3 py-6 space-y-2">
-        {menuItems.map((item, index) => {
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
+        {menuItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
 
           return (
             <button
-              key={index}
+              key={item.path}
+              type="button"
               onClick={() => navigate(item.path)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition-colors ${
                 active
-                  ? "bg-green-100 text-green-700 font-semibold border-l-4 border-green-600"
-                  : "text-gray-600 hover:bg-green-50 hover:text-green-600"
+                  ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
-              <Icon
-                size={20}
-                className={`${
-                  active ? "text-green-600" : "text-gray-400"
-                }`}
-              />
-
-              <div className="flex-1 text-left">
-                <p className="text-sm">{item.label}</p>
-                <p className="text-xs text-gray-500">
-                  {item.description}
-                </p>
-              </div>
-
-              {active && (
-                <ChevronRight size={16} className="text-green-600" />
-              )}
+              <Icon size={20} className={active ? "text-emerald-600" : "text-slate-400"} />
+              <span className="min-w-0 flex-1 text-left">
+                <span className={`block text-sm ${active ? "font-semibold" : "font-medium"}`}>
+                  {item.label}
+                </span>
+                <span className="block truncate text-xs text-slate-400">{item.description}</span>
+              </span>
+              {active && <ChevronRight size={16} className="text-emerald-600" />}
             </button>
           );
         })}
       </nav>
 
-      {/* 🔻 LOGOUT */}
-      <div className="px-3 py-5 border-t border-gray-100">
+      <div className="border-t border-slate-100 px-3 py-5">
         <button
+          type="button"
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-all"
+          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-red-500 transition-colors hover:bg-red-50"
         >
           <LogOut size={20} />
           <span className="text-sm font-medium">Logout</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 };
 
