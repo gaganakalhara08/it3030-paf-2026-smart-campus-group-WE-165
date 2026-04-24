@@ -6,6 +6,7 @@ import AdminStats from "../components/admin/AdminStats";
 import AdminQuickActions from "../components/admin/AdminQuickActions";
 import { API_BASE_URL } from "../services/api";
 import heroBg from "../assets/Green.jpg";
+import UserHeader from "../components/user/UserHeader";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -87,44 +88,7 @@ return (
     <div className="ml-64 flex flex-col flex-1">
 
       {/* 🌿 HERO HEADER */}
-      <div
-        className="relative px-6 py-6 border-b border-gray-200"
-        style={{
-          backgroundImage: `url(${heroBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        {/* overlay */}
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
-
-        <div className="relative flex justify-between items-center">
-          
-          {/* LEFT */}
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">
-            </h1>
-          </div>
-
-          {/* RIGHT */}
-          <div className="flex items-center gap-6">
-            
-            <button className="text-gray-600 hover:text-green-600 transition text-lg">
-              🔔
-            </button>
-
-            <div className="text-right">
-              <p className="text-gray-900 font-semibold">
-                {user?.name || "Admin"}
-              </p>
-              <p className="text-sm text-gray-500">
-                {user?.email}
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </div>
+      <UserHeader user={user} />
 
       {/* 📦 CONTENT */}
       <div className="flex-1 px-6 py-8 overflow-y-auto">

@@ -1,12 +1,11 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  Home,
   Building2,
   LayoutDashboard,
   Calendar,
-  Plus,
   LogOut,
+  ChevronRight,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -16,22 +15,25 @@ const Sidebar = () => {
   const menuItems = [
     {
       label: "Browse Resources",
+      description: "Explore available facilities",
       icon: Building2,
       path: "/user/resources",
     },
     {
       label: "Tickets",
+      description: "Track support requests",
       icon: LayoutDashboard,
       path: "/user/dashboard/tickets",
     },
     {
       label: "My Bookings",
+      description: "View and manage bookings",
       icon: Calendar,
       path: "/user/bookings/dashboard",
-    }
+    },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname.startsWith(path);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -39,19 +41,31 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col z-50">
+    <div className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-50">
 
-      {/* 🔥 LOGO (CLICKABLE → DASHBOARD) */}
+      {/* 🔝 LOGO SECTION */}
       <div
         onClick={() => navigate("/user/dashboard")}
-        className="py-6 text-center border-b cursor-pointer hover:bg-green-50 transition"
+        className="px-6 py-6 text-center cursor-pointer hover:bg-green-50 transition border-b border-gray-100"
       >
-        <h1 className="text-xl font-bold text-gray-800">Campus Ops</h1>
-        <p className="text-xs text-gray-500">User Portal</p>
+        {/* LOGO TEXT */}
+        <h1 className="text-sm font-bold tracking-wide text-gray-700 mb-2">
+          CAMPUS OPS
+        </h1>
+
+        {/* NAME */}
+        <h2 className="text-lg font-semibold text-gray-800">
+          Campus Ops
+        </h2>
+
+        {/* SUBTEXT */}
+        <p className="text-xs text-gray-400 mt-1">
+          Student Portal
+        </p>
       </div>
 
-      {/* Menu */}
-      <div className="flex-1 flex flex-col justify-center px-4 space-y-2">
+      {/* 📚 MENU */}
+      <nav className="flex-1 flex flex-col justify-center px-3 py-6 space-y-2">
         {menuItems.map((item, index) => {
           const Icon = item.icon;
           const active = isActive(item.path);
@@ -60,27 +74,42 @@ const Sidebar = () => {
             <button
               key={index}
               onClick={() => navigate(item.path)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 active
-                  ? "bg-green-100 text-green-700 font-semibold"
+                  ? "bg-green-100 text-green-700 font-semibold border-l-4 border-green-600"
                   : "text-gray-600 hover:bg-green-50 hover:text-green-600"
               }`}
             >
-              <Icon size={18} />
-              {item.label}
+              <Icon
+                size={20}
+                className={`${
+                  active ? "text-green-600" : "text-gray-400"
+                }`}
+              />
+
+              <div className="flex-1 text-left">
+                <p className="text-sm">{item.label}</p>
+                <p className="text-xs text-gray-500">
+                  {item.description}
+                </p>
+              </div>
+
+              {active && (
+                <ChevronRight size={16} className="text-green-600" />
+              )}
             </button>
           );
         })}
-      </div>
+      </nav>
 
-      {/* Logout */}
-      <div className="p-4 border-t">
+      {/* 🔻 LOGOUT */}
+      <div className="px-3 py-5 border-t border-gray-100">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg w-full"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-all"
         >
-          <LogOut size={18} />
-          Logout
+          <LogOut size={20} />
+          <span className="text-sm font-medium">Logout</span>
         </button>
       </div>
     </div>

@@ -1,9 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import UserHeader from "../components/user/UserHeader";
 
 const UserDashboard = () => {
   const userName = localStorage.getItem("userName");
+
+  // ✅ ADD THIS
+  const [user, setUser] = useState(null);
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      setUser(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -15,7 +38,8 @@ const UserDashboard = () => {
       <div className="flex-1 flex flex-col ml-64">
 
         {/* Header */}
-        <UserHeader />
+        {/* ✅ CHANGE ONLY THIS LINE */}
+        <UserHeader user={user} />
 
         {/* Content */}
         <div className="flex-1 px-6 py-10">
