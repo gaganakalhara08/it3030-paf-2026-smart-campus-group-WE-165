@@ -1,9 +1,15 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "../pages/Login";
+import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import UserDashboard from "../pages/UserDashboard";
 import AdminDashboard from "../pages/AdminDashboard";
+import TechnicianDashboard from "../pages/TechnicianDashboard";
+import TicketStudentView from "../pages/TicketStudentView";
+import TicketAllView from "../pages/TicketAllView";
+import CreateTicketModal from "../components/CreateTicketModal";
+import TicketCommentSection from "../components/TicketCommentSection";
 import ProtectedRoute from "./ProtectedRoute";
 import CreateBooking from "../pages/user/booking/CreateBooking";
 import BookingDetails from "../pages/user/booking/BookingDetails";
@@ -11,334 +17,44 @@ import BookingDashboard from "../pages/user/booking/BookingDashboard";
 import BookingCheckIn from "../pages/user/booking/BookingCheckIn";
 import AdminBookingDashboard from "../pages/admin/booking/AdminBookingDashboard";
 import AdminAnalyticsDashboard from "../pages/admin/booking/AdminAnalyticsDashboard";
-// Ticket Components
-import TicketDetailsModal from "../components/TicketDetailsModal";
-import TicketCommentSection from "../components/TicketCommentSection";
-import TechnicianDashboard from "../pages/TechnicianDashboard";
-import TicketStudentView from "../pages/TicketStudentView";
-import TicketAllView from "../pages/TicketAllView";
-import CreateTicketModal from "../components/CreateTicketModal";
-
-import Signup from "../pages/Signup";
 import UserManagement from "../pages/admin/user/UserManagement";
-
-// // ── Module A: Facilities & Assets Catalogue
 import AdminFacilitiesPage from "../pages/admin/resource/AdminFacilitiesPage";
+import AdminResourceAnalytics from "../pages/admin/resource/AdminResourceAnalytics";
 import UserResourceCatalogue from "../pages/user/resource/UserResourceCatalogue";
 
-// ── Module A Special Features
-import AdminResourceAnalytics from "../pages/admin/resource/AdminResourceAnalytics";
+const protect = (component) => <ProtectedRoute>{component}</ProtectedRoute>;
 
-const AppRoutes = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        
-        {/* Protected Routes */}
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Admin Routes */}
-        <Route 
-          path="/admin/dashboard" 
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } 
-        />
+const AppRoutes = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
-        <Route
-          path="/admin/tickets"
-          element={
-            <ProtectedRoute>
-                <TicketAllView />
-            </ProtectedRoute>
-          }
-        />
+      <Route path="/dashboard" element={protect(<Dashboard />)} />
 
-        <Route 
-          path="/admin/users" 
-          element={
-            <ProtectedRoute>
-              <UserManagement />
-            </ProtectedRoute>
-          } 
-        />
+      <Route path="/admin/dashboard" element={protect(<AdminDashboard />)} />
+      <Route path="/admin/bookings" element={protect(<AdminBookingDashboard />)} />
+      <Route path="/admin/analytics" element={protect(<AdminAnalyticsDashboard />)} />
+      <Route path="/admin/tickets" element={protect(<TicketAllView />)} />
+      <Route path="/admin/users" element={protect(<UserManagement />)} />
+      <Route path="/admin/facilities" element={protect(<AdminFacilitiesPage />)} />
+      <Route path="/admin/resource-analytics" element={protect(<AdminResourceAnalytics />)} />
 
-        {/* ========== TECHNICIAN ROUTES ========== */}
-        <Route
-          path="/technician/dashboard"
-          element={
-            <ProtectedRoute>
-                <TechnicianDashboard />
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route 
-          path="/admin/bookings" 
-          element={
-            <ProtectedRoute>
-              <AdminBookingDashboard />
-            </ProtectedRoute>
-          } 
-        />
+      <Route path="/technician/dashboard" element={protect(<TechnicianDashboard />)} />
 
-        <Route 
-          path="/admin/analytics" 
-          element={
-            <ProtectedRoute>
-              <AdminAnalyticsDashboard />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* User Routes */}
-        <Route 
-          path="/user/dashboard" 
-          element={
-            <ProtectedRoute>
-              <UserDashboard />
-            </ProtectedRoute>
-          } 
-        />
-
-        <Route
-          path="/user/dashboard/tickets"
-          element={
-            <ProtectedRoute>
-              <TicketStudentView />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/user/dashboard/create"
-          element={
-            <ProtectedRoute>
-              <CreateTicketModal />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/user/dashboard/commnet"
-          element={
-            <ProtectedRoute>
-              <TicketCommentSection />
-            </ProtectedRoute>
-          }
-        />
-
-        
-        <Route 
-          path="/admin/users" 
-          element={
-            <ProtectedRoute>
-              <UserManagement />
-            </ProtectedRoute>
-          } 
-        />
-
-        {/* Module A — Facilities Management */}
-        <Route path="/admin/facilities"         element={<ProtectedRoute><AdminFacilitiesPage /></ProtectedRoute>} />
-
-      {/* Module A Special Feature 1 — Resource Analytics */}
-      <Route path="/admin/resource-analytics" element={<ProtectedRoute><AdminResourceAnalytics /></ProtectedRoute>} />
-
-      {/* ── User routes ── */}
-      <Route path="/user/dashboard"              element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
-      <Route path="/user/bookings/dashboard"     element={<ProtectedRoute><BookingDashboard /></ProtectedRoute>} />
-      <Route path="/user/bookings/create"        element={<ProtectedRoute><CreateBooking /></ProtectedRoute>} />
-      <Route path="/user/bookings/:id/check-in"  element={<ProtectedRoute><BookingCheckIn /></ProtectedRoute>} />
-      {/* Backward-compatible alias for older QR codes */}
-      <Route path="/user/bookings/check-in/:id"  element={<ProtectedRoute><BookingCheckIn /></ProtectedRoute>} />
-      <Route path="/user/bookings/:id"           element={<ProtectedRoute><BookingDetails /></ProtectedRoute>} />
-
-        {/* Module A — User Resource Catalogue (Feature 3 calendar is inside the detail modal) */}
-        <Route path="/user/resources"              element={<ProtectedRoute><UserResourceCatalogue /></ProtectedRoute>} />
-
-
-        {/* User Booking Management Routes */}
-        <Route 
-          path="/user/bookings/dashboard" 
-          element={
-            <ProtectedRoute>
-              <BookingDashboard />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/user/bookings/create" 
-          element={
-            <ProtectedRoute>
-              <CreateBooking />
-            </ProtectedRoute>
-          } 
-        />
-
-        <Route 
-          path="/user/bookings/:id/check-in" 
-          element={
-            <ProtectedRoute>
-              <BookingCheckIn />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/user/bookings/:id" 
-          element={
-            <ProtectedRoute>
-              <BookingDetails />
-            </ProtectedRoute>
-          } 
-        />
-
-        
-      </Routes>
-    </BrowserRouter>
-  );
-};
+      <Route path="/user/dashboard" element={protect(<UserDashboard />)} />
+      <Route path="/user/dashboard/tickets" element={protect(<TicketStudentView />)} />
+      <Route path="/user/dashboard/create" element={protect(<CreateTicketModal />)} />
+      <Route path="/user/dashboard/comment" element={protect(<TicketCommentSection />)} />
+      <Route path="/user/resources" element={protect(<UserResourceCatalogue />)} />
+      <Route path="/user/bookings/dashboard" element={protect(<BookingDashboard />)} />
+      <Route path="/user/bookings/create" element={protect(<CreateBooking />)} />
+      <Route path="/user/bookings/:id/check-in" element={protect(<BookingCheckIn />)} />
+      <Route path="/user/bookings/check-in/:id" element={protect(<BookingCheckIn />)} />
+      <Route path="/user/bookings/:id" element={protect(<BookingDetails />)} />
+    </Routes>
+  </BrowserRouter>
+);
 
 export default AppRoutes;
-
-
-// import React from "react";
-// import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import Login from "../pages/Login";
-// import Dashboard from "../pages/Dashboard";
-// import UserDashboard from "../pages/UserDashboard";
-// import AdminDashboard from "../pages/AdminDashboard";
-// import ProtectedRoute from "./ProtectedRoute";
-// import CreateBooking from "../pages/user/booking/CreateBooking";
-// import BookingDetails from "../pages/user/booking/BookingDetails";
-// import BookingDashboard from "../pages/user/booking/BookingDashboard";
-// import BookingCheckIn from "../pages/user/booking/BookingCheckIn";
-// import AdminBookingDashboard from "../pages/admin/booking/AdminBookingDashboard";
-// import AdminAnalyticsDashboard from "../pages/admin/booking/AdminAnalyticsDashboard";
-// // Ticket Components
-// import TicketDetailsModal from "../components/TicketDetailsModal";
-// import TicketCommentSection from "../components/TicketCommentSection";
-// import TechnicianDashboard from "../pages/TechnicianDashboard";
-// import TicketStudentView from "../pages/TicketStudentView";
-// import TicketAllView from "../pages/TicketAllView";
-// import CreateTicketModal from "../components/CreateTicketModal";
-
-// import Signup from "../pages/Signup";
-
-// // ── Module A: Facilities & Assets Catalogue
-// import AdminFacilitiesPage from "../pages/admin/resource/AdminFacilitiesPage";
-// import UserResourceCatalogue from "../pages/user/resource/UserResourceCatalogue";
-
-// // ── Module A Special Features
-// import AdminResourceAnalytics from "../pages/admin/resource/AdminResourceAnalytics";
-
-
-// const wrap = (Component) => (
-//   <ProtectedRoute><Component /></ProtectedRoute>
-// );
-
-// const AppRoutes = () => (
-//   <BrowserRouter>
-//     <Routes>
-//       <Route path="/login"  element={<Login />} />
-//       <Route path="/"       element={<Login />} />
-//       <Route path="/signup" element={<Signup />} />
-
-//       {/* Generic dashboard */}
-//       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-
-//       {/* ── Admin routes ── */}
-//       <Route path="/admin/dashboard"          element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-//       <Route path="/admin/bookings"           element={<ProtectedRoute><AdminBookingDashboard /></ProtectedRoute>} />
-//       <Route path="/admin/analytics"          element={<ProtectedRoute><AdminAnalyticsDashboard /></ProtectedRoute>} />
-//       <Route path="/admin/users"              element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
-
-//       {/* Module A — Facilities Management */}
-//       <Route path="/admin/facilities"         element={<ProtectedRoute><AdminFacilitiesPage /></ProtectedRoute>} />
-
-//       {/* Module A Special Feature 1 — Resource Analytics */}
-//       <Route path="/admin/resource-analytics" element={<ProtectedRoute><AdminResourceAnalytics /></ProtectedRoute>} />
-
-//       {/* ── User routes ── */}
-//       <Route path="/user/dashboard"              element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
-//       <Route path="/user/bookings/dashboard"     element={<ProtectedRoute><BookingDashboard /></ProtectedRoute>} />
-//       <Route path="/user/bookings/create"        element={<ProtectedRoute><CreateBooking /></ProtectedRoute>} />
-//       <Route path="/user/bookings/:id/check-in"  element={<ProtectedRoute><BookingCheckIn /></ProtectedRoute>} />
-//       <Route path="/user/bookings/:id"           element={<ProtectedRoute><BookingDetails /></ProtectedRoute>} />
-
-//       {/* Module A — User Resource Catalogue (Feature 3 calendar is inside the detail modal) */}
-//       <Route path="/user/resources"              element={<ProtectedRoute><UserResourceCatalogue /></ProtectedRoute>} />
-
-//               {/* ========== TECHNICIAN ROUTES ========== */}
-//         <Route
-//           path="/technician/dashboard"
-//           element={
-//             <ProtectedRoute>
-//                 <TechnicianDashboard />
-//             </ProtectedRoute>
-//           }
-//         />
-        
-//         <Route 
-//           path="/admin/bookings" 
-//           element={
-//             <ProtectedRoute>
-//               <AdminBookingDashboard />
-//             </ProtectedRoute>
-//           } 
-//         />
-
-//         <Route
-//           path="/admin/tickets"
-//           element={
-//             <ProtectedRoute>
-//                 <TicketAllView />
-//             </ProtectedRoute>
-//           }
-//         />
-
-//         <Route
-//           path="/user/dashboard/tickets"
-//           element={
-//             <ProtectedRoute>
-//               <TicketStudentView />
-//             </ProtectedRoute>
-//           }
-//         />
-
-//         <Route
-//           path="/user/dashboard/create"
-//           element={
-//             <ProtectedRoute>
-//               <CreateTicketModal />
-//             </ProtectedRoute>
-//           }
-//         />
-
-//         <Route
-//           path="/user/dashboard/commnet"
-//           element={
-//             <ProtectedRoute>
-//               <TicketCommentSection />
-//             </ProtectedRoute>
-//           }
-//         />
-//     </Routes>
-//   </BrowserRouter>
-// );
-
-// export default AppRoutes;
-
