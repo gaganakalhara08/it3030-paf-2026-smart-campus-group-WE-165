@@ -122,7 +122,7 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Write your comment or reply here..."
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
           rows="3"
           disabled={submitting}
         />
@@ -130,7 +130,7 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
           <button
             type="submit"
             disabled={submitting || !newComment.trim()}
-            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {submitting ? 'Posting...' : 'Post Comment'}
           </button>
@@ -177,7 +177,7 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
                     <button
                       onClick={() => handleSaveEdit(comment.id)}
                       disabled={submitting}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
                     >
                       {submitting ? 'Saving...' : 'Save'}
                     </button>
@@ -188,7 +188,7 @@ const TicketCommentSection = ({ ticketId, userEmail, onCommentAdded }) => {
                 <>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                         <span className="text-blue-600 font-semibold text-sm">
                           {comment.userName.charAt(0).toUpperCase()}
                         </span>

@@ -18,13 +18,10 @@ import { API_BASE_URL } from "../services/api";
 const CATEGORY_LABELS = {
   ELECTRICAL: "Electrical",
   PLUMBING: "Plumbing",
-  HVAC: "HVAC",
-  FURNITURE: "Furniture",
-  EQUIPMENT: "Equipment",
   CLEANING: "Cleaning",
   SECURITY: "Security",
   IT_SUPPORT: "IT Support",
-  STRUCTURAL: "Structural",
+  ACADEMIC: "Academic",
   OTHER: "Other",
 };
 

@@ -199,7 +199,7 @@ const CreateTicketModal = ({ isOpen, onClose, onTicketCreated }) => {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 flex justify-between items-center">
+        <div className="sticky top-0 bg-green-700 text-white p-6 flex justify-between items-center">
           <h2 className="text-2xl font-bold">Create New Ticket</h2>
           <button
             onClick={onClose}

@@ -172,7 +172,7 @@ const TicketStudentView = ({ userEmail }) => {
                 type="button"
                 key={ticket.id}
                 onClick={() => handleView(ticket.id)}
-                className="rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md"
+                className="cursor-pointer rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md"
               >
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <h3 className="text-lg font-semibold text-slate-900">{ticket.title}</h3>
@@ -186,7 +186,7 @@ const TicketStudentView = ({ userEmail }) => {
                 </p>
 
                 <div className="flex justify-between text-xs font-medium text-slate-400">
-                  <span>#{ticket.id}</span>
+                  {/* <span>#{ticket.id}</span> */}
                   <span>{ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString() : "N/A"}</span>
                 </div>
               </button>
