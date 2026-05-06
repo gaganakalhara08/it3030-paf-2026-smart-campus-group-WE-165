@@ -1,5 +1,4 @@
-export const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL ?? "").replace(/\/$/, "");
-
+export const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL ?? "https://smart-campus-backend-tedr.onrender.com").replace(/\/$/, "");
 export const API_BASE_URL = `${APP_BASE_URL}/api`;
 
 export const getAuthHeaders = () => {
