@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../services/api";
 import UserDashboard from "./UserDashboard";
 import AdminDashboard from "./AdminDashboard";
 import TechnicianDashboard from "./TechnicianDashboard";
@@ -25,7 +26,7 @@ const Dashboard = () => {
 
         console.log("✅ Token found, fetching user data...");
 
-        const res = await fetch("http://localhost:8080/api/auth/me", {
+        const res = await fetch(`${API_BASE_URL}/auth/me`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

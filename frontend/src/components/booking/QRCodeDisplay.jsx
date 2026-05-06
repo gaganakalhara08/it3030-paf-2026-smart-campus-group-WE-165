@@ -3,13 +3,15 @@ import { QRCodeSVG } from "qrcode.react";
 import { Download } from "lucide-react";
 import toast from "react-hot-toast";
 
+const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL || window.location.origin).replace(/\/$/, "");
+
 const QRCodeDisplay = ({ qrValue, bookingUrl, bookingId }) => {
   const qrRef = React.useRef(null);
 
   const resolvedValue =
     (typeof qrValue === "string" && qrValue.trim()) ||
     (typeof bookingUrl === "string" && bookingUrl.trim()) ||
-    (bookingId ? `${window.location.origin}/user/bookings/${bookingId}/check-in` : "");
+    (bookingId ? `${APP_BASE_URL}/user/bookings/${bookingId}/check-in` : "");
 
   if (!resolvedValue) {
     return (

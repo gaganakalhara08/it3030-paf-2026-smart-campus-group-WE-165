@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../services/api";
 
 const RoleBasedRoute = ({ children, requiredRole }) => {
   const [isAuthorized, setIsAuthorized] = useState(null);
@@ -17,7 +18,7 @@ const RoleBasedRoute = ({ children, requiredRole }) => {
           return;
         }
 
-        const res = await fetch("http://localhost:8080/api/auth/me", {
+        const res = await fetch(`${API_BASE_URL}/auth/me`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -1,4 +1,6 @@
-export const API_BASE_URL = "http://localhost:8080/api";
+export const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL ?? "").replace(/\/$/, "");
+
+export const API_BASE_URL = `${APP_BASE_URL}/api`;
 
 export const getAuthHeaders = () => {
   const token = localStorage.getItem("token");

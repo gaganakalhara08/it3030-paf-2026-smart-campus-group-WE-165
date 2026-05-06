@@ -16,6 +16,7 @@ import {
 import toast from "react-hot-toast";
 import BookingsMonthCalendar from "../../../components/booking/BookingsMonthCalendar";
 import UserLayout from "../../../components/user/UserLayout";
+import { API_BASE_URL } from "../../../services/api";
 
 const StatCard = ({ icon, label, count, tint }) => {
   const Icon = icon;
@@ -55,7 +56,6 @@ const BookingDashboard = () => {
         return;
       }
 
-      const API_BASE_URL = "http://localhost:8080/api";
       let url = `${API_BASE_URL}/bookings/my-bookings`;
 
       if (statusFilter) {
@@ -101,7 +101,7 @@ const BookingDashboard = () => {
     if (window.confirm("Are you sure you want to delete this booking?")) {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
+        const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -124,7 +124,7 @@ const BookingDashboard = () => {
     if (window.confirm("Are you sure you want to cancel this booking?")) {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}/cancel`, {
+        const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}/cancel`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

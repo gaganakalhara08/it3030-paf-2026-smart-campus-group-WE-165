@@ -4,6 +4,7 @@ import { login } from "../services/authService";
 import { FcGoogle } from "react-icons/fc";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import "../App.css";
+import { APP_BASE_URL } from "../services/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    window.location.href = `${APP_BASE_URL}/oauth2/authorization/google`;
   };
 
   return (

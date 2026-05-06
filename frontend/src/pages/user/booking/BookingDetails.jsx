@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { API_BASE_URL } from "../../../services/api";
 import QRCodeDisplay from "../../../components/booking/QRCodeDisplay";
 import UserLayout from "../../../components/user/UserLayout";
+const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL || window.location.origin).replace(/\/$/, "");
 
 const formatDate = (value) => {
   if (!value) return "N/A";
@@ -427,7 +428,7 @@ const BookingDetails = () => {
 
           <div className="lg:col-span-1">
             <QRCodeDisplay
-              qrValue={`${window.location.origin}/user/bookings/${booking.id}/check-in`}
+              qrValue={`${APP_BASE_URL}/user/bookings/${booking.id}/check-in`}
               bookingId={booking.id}
             />
           </div>

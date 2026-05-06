@@ -3,16 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CheckCircle, Clock, MapPin, Users, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import UserLayout from "../../../components/user/UserLayout";
+import { API_BASE_URL } from "../../../services/api";
 
-const isLocalHost =
-  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-
-const API_BASE_URL = isLocalHost
-  ? "http://localhost:8080/api"
-  : "http://" + window.location.hostname + ":8080/api";
-
-// Set this in frontend/.env for mobile QR scan:
-// VITE_APP_BASE_URL=http://192.168.1.25:5173
 const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL || window.location.origin).replace(/\/$/, "");
 
 const BookingCheckIn = () => {
