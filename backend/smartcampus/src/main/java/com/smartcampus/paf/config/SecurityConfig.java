@@ -2,13 +2,16 @@ package com.smartcampus.paf.config;
 
 import com.smartcampus.paf.security.CustomUserDetailsService;
 import com.smartcampus.paf.security.JwtAuthenticationFilter;
+import com.smartcampus.paf.security.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.smartcampus.paf.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,6 +27,11 @@ public class SecurityConfig {
     @Bean
     public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
         return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
     @Bean
@@ -56,6 +64,9 @@ public class SecurityConfig {
                 )
 
                 .oauth2Login(oauth -> oauth
+                        .authorizationEndpoint(endpoint ->
+                                endpoint.authorizationRequestRepository(authorizationRequestRepository())
+                        )
                         .successHandler(oAuth2SuccessHandler)
                 )
 
